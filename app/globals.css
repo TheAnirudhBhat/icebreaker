@@ -1,0 +1,411 @@
+@import "tailwindcss";
+
+/* Self-hosted Hinge type, served from /public/fonts.
+   Tiempos Headline (serif) is the full retail family (Regular/Medium/Semibold + italics).
+   Modern Era (sans) still ships a single Regular weight, so heavier UI weights are
+   browser-synthesized; drop more weights here to make them true. */
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("/fonts/TiemposHeadline-Regular.otf") format("opentype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("/fonts/TiemposHeadline-RegularItalic.otf") format("opentype");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("/fonts/TiemposHeadline-Medium.otf") format("opentype");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("/fonts/TiemposHeadline-MediumItalic.otf") format("opentype");
+  font-weight: 500; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("/fonts/TiemposHeadline-Semibold.otf") format("opentype");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Modern Era";
+  src: url("/fonts/ModernEra-Regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Modern Era";
+  src: url("/fonts/ModernEra-Italic.ttf") format("truetype");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+
+:root {
+  /* Tiempos / Modern Era when self-hosted; Lora / Hanken Grotesk fallback via <link> */
+  --font-serif: "Tiempos Headline", "Lora", Georgia, "Times New Roman", serif;
+  --font-sans: "Modern Era", "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+
+  /* Surface */
+  --background: #fbf8f4;
+  --foreground: rgba(26, 22, 20, 0.92);
+
+  /* Brand */
+  --plum: #6d3ba4;
+  --rose: #e2566f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #ffffff; /* white stage behind the device */
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* ============ KEYFRAMES ============ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes chatIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes typingPulse {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+
+@keyframes revealPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes softFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.18); }
+  40% { transform: scale(1); }
+  60% { transform: scale(1.12); }
+}
+
+@keyframes shimmerSweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============ CLASSES ============ */
+
+.anim-fade-in { animation: fadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes softIn { from { opacity: 0; } to { opacity: 1; } }
+.anim-soft-in { animation: softIn 0.26s ease both; }
+@media (prefers-reduced-motion: reduce) { .anim-soft-in { animation: none; } }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.anim-spin { animation: spin 0.8s linear infinite; }
+
+@keyframes waveDrift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.anim-wave-drift { animation: waveDrift 14s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .anim-wave-drift { animation: none; } }
+
+@keyframes cardExpandOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.18); opacity: 0; } }
+.anim-card-expand-out { animation: cardExpandOut 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@media (prefers-reduced-motion: reduce) { .anim-card-expand-out { animation: none; opacity: 0; } }
+
+/* gentle horizontal push for stepping between screens / questions */
+@keyframes pushInRight { from { opacity: 0; transform: translateX(44px); } to { opacity: 1; transform: translateX(0); } }
+.anim-push-in { animation: pushInRight 0.58s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) { .anim-push-in { animation: none; } }
+
+/* reveal cover: skew up, then toss off to the side */
+@keyframes cardToss {
+  0% { transform: perspective(720px) rotateX(0deg) translate(0, 0) rotate(0deg) scale(1); box-shadow: 0 10px 26px -14px rgba(36,18,57,0.45); opacity: 1; }
+  32% { transform: perspective(720px) rotateX(-24deg) translate(0, -14px) rotate(0deg) scale(1.05); box-shadow: 0 34px 46px -18px rgba(36,18,57,0.55); opacity: 1; }
+  100% { transform: perspective(720px) rotateX(-12deg) translate(200px, 150px) rotate(12deg) scale(0.86); box-shadow: 0 50px 50px -24px rgba(36,18,57,0.25); opacity: 0; }
+}
+.anim-card-toss { animation: cardToss 0.6s cubic-bezier(0.4, 0, 0.4, 1) forwards; }
+@media (prefers-reduced-motion: reduce) { .anim-card-toss { animation: none; opacity: 0; } }
+
+/* push notification dropping in from the top */
+@keyframes pushDownIn { from { opacity: 0; transform: translateY(-130%); } to { opacity: 1; transform: translateY(0); } }
+.anim-push-down { animation: pushDownIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) { .anim-push-down { animation: none; } }
+
+/* in-chat nudge rising into place */
+@keyframes nudgeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.anim-nudge-up { animation: nudgeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) { .anim-nudge-up { animation: none; } }
+.anim-chat-in { animation: chatIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-sheet-up { animation: sheetUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-backdrop-in { animation: backdropIn 0.28s ease both; }
+
+@keyframes sheetDown {
+  from { transform: translateY(0); }
+  to { transform: translateY(112%); }
+}
+@keyframes backdropOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.anim-sheet-down { animation: sheetDown 0.34s cubic-bezier(0.4, 0, 1, 1) both; }
+.anim-backdrop-out { animation: backdropOut 0.34s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-sheet-down { animation: none; opacity: 0; }
+  .anim-backdrop-out { animation: none; opacity: 0; }
+}
+.anim-reveal-pop { animation: revealPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.anim-soft-float { animation: softFloat 5s ease-in-out infinite; }
+.anim-heartbeat { animation: heartBeat 0.9s ease-in-out; }
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: typingPulse 1.3s ease-in-out infinite;
+}
+
+/* ============ FLIP CARD ============ */
+
+.flip-card {
+  perspective: 1000px;
+}
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.flip-card.is-flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+.flip-front,
+.flip-back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+/* ============ SCROLLBAR ============ */
+
+::-webkit-scrollbar { width: 0; height: 0; }
+::-webkit-scrollbar-thumb { background: transparent; }
+
+/* ============ REDUCED MOTION ============ */
+
+@keyframes qIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes optionIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-q-in { animation: qIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-option-in { animation: optionIn 0.44s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* send button revealing from the right as the input narrows */
+@keyframes growBtn {
+  from { width: 0; }
+  to { width: 54px; }
+}
+.anim-grow-btn { animation: growBtn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-grow-btn { animation: none; width: 54px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-in,
+  .anim-chat-in,
+  .anim-sheet-up,
+  .anim-backdrop-in,
+  .anim-reveal-pop,
+  .anim-soft-float,
+  .anim-heartbeat,
+  .anim-q-in,
+  .anim-option-in,
+  .typing-dot {
+    animation: none;
+  }
+  .flip-inner { transition: none; }
+}
+
+/* ============ GRAND REVEAL ============ */
+
+@keyframes cardPop {
+  0% { opacity: 0; transform: translateY(16px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.anim-card-pop { animation: cardPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes avatarsIn {
+  0% { opacity: 0; transform: scale(0.86); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.anim-avatars-in { animation: avatarsIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes countPop {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.anim-count-pop { animation: countPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes sparkleFly {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a, 0deg)) translateY(0) scale(0.2); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a, 0deg)) translateY(calc(-1 * var(--d, 54px))) scale(1); }
+}
+.sparkle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  animation: sparkleFly 0.9s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-card-pop,
+  .anim-avatars-in,
+  .anim-count-pop,
+  .sparkle {
+    animation: none;
+  }
+}
+
+@keyframes cardGlow {
+  0%, 100% { box-shadow: 0 14px 30px -16px rgba(36,18,57,0.7), 0 0 0 0 rgba(226,86,111,0); }
+  50% { box-shadow: 0 16px 34px -14px rgba(36,18,57,0.85), 0 0 26px 2px rgba(226,86,111,0.45); }
+}
+.anim-card-glow { animation: cardGlow 2.6s ease-in-out infinite; }
+
+@keyframes cardFlipOpen {
+  0% { transform: perspective(1100px) rotateY(0deg); opacity: 1; }
+  100% { transform: perspective(1100px) rotateY(90deg); opacity: 0; }
+}
+.anim-card-flip-open { animation: cardFlipOpen 0.4s cubic-bezier(0.4, 0, 0.5, 1) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-card-glow { animation: none; }
+  .anim-card-flip-open { animation: none; opacity: 0; }
+}
+
+@keyframes iceShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px) rotate(-0.5deg); }
+  75% { transform: translateX(3px) rotate(0.5deg); }
+}
+.anim-ice-shake { animation: iceShake 0.2s ease; }
+
+@keyframes iceShatter {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  40% { transform: scale(1.04) rotate(-1deg); opacity: 1; }
+  100% { transform: scale(1.16) rotate(2deg); opacity: 0; }
+}
+.anim-ice-shatter { animation: iceShatter 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-ice-shake,
+  .anim-ice-shatter { animation: none; }
+}
+
+/* frosted ice cracking, then dissolving away (no rotate) */
+@keyframes iceCrack {
+  0% { opacity: 1; transform: scale(1); }
+  18% { transform: scale(0.99); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+.anim-ice-crack { animation: iceCrack 0.44s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-ice-crack { animation: none; opacity: 0; }
+}
+
+/* ============ REVEAL ANIMATION VARIANTS ============ */
+
+@keyframes revFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rev-fade { animation: revFade 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes revBlur {
+  from { opacity: 0; filter: blur(7px); }
+  to { opacity: 1; filter: blur(0); }
+}
+.rev-blur { animation: revBlur 0.55s ease both; }
+
+@keyframes revUnfurl {
+  from { clip-path: inset(0 0 100% 0); opacity: 0.5; }
+  to { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+.anim-unfurl { animation: revUnfurl 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rev-fade,
+  .rev-blur,
+  .anim-unfurl { animation: none; }
+}
+
+@keyframes flipOut {
+  from { transform: rotateY(0deg); opacity: 1; }
+  to { transform: rotateY(90deg); opacity: 0; }
+}
+.anim-flip-out { animation: flipOut 0.32s ease-in both; transform-origin: center; }
+
+@keyframes flipIn {
+  from { transform: rotateY(-90deg); opacity: 0; }
+  to { transform: rotateY(0deg); opacity: 1; }
+}
+.anim-flip-in { animation: flipIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: center; }
+
+@keyframes expandIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.anim-expand-in { animation: expandIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-flip-out,
+  .anim-flip-in,
+  .anim-expand-in { animation: none; }
+}
