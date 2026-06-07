@@ -52,7 +52,7 @@ export default function DeviceFrame({ children }: { children: ReactNode }) {
           height: "100%",
           zIndex: 2,
           pointerEvents: "none",
-          filter: "drop-shadow(0px 22px 50px rgba(0,0,0,0.18)) drop-shadow(0px 4px 14px rgba(0,0,0,0.10))",
+          filter: "drop-shadow(0 14px 32px rgba(26,22,20,0.16)) drop-shadow(0 3px 9px rgba(26,22,20,0.10))",
         }}
       />
     </div>
