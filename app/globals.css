@@ -409,3 +409,12 @@ body {
   .anim-flip-in,
   .anim-expand-in { animation: none; }
 }
+
+/* ============ MOBILE BLOCKER ============ */
+/* The proto is two phones side by side; it needs a wide screen. On narrow
+   viewports hide the app and show a short note asking to open on desktop. */
+.mobile-blocker { display: none; }
+@media (max-width: 900px) {
+  .desktop-app { display: none !important; }
+  .mobile-blocker { display: flex !important; }
+}

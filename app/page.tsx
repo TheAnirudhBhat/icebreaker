@@ -66,17 +66,41 @@ export default function Page() {
   const aanyaNote = connectNote("aanya");
 
   return (
-    <main
-      style={{
-        position: "relative",
-        minHeight: "100dvh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "16px",
-        background: "#FFFFFF",
-      }}
-    >
+    <>
+      {/* The proto is two phones side by side, so it needs a desktop-width screen.
+          On mobile we hide it (CSS, see .mobile-blocker) and show a short note. */}
+      <div
+        className="mobile-blocker"
+        style={{
+          minHeight: "100dvh",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "40px 32px",
+          background: "#FFFFFF",
+          gap: 14,
+        }}
+      >
+        <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 30, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
+          Icebreaker
+        </div>
+        <p style={{ fontFamily: FONT_SERIF, fontWeight: 400, fontSize: 19, lineHeight: "27px", color: TEXT_SECONDARY, maxWidth: 300, margin: 0 }}>
+          This prototype is best viewed on a desktop. Open it on a larger screen to explore.
+        </p>
+      </div>
+      <main
+        className="desktop-app"
+        style={{
+          position: "relative",
+          minHeight: "100dvh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "16px",
+          background: "#FFFFFF",
+        }}
+      >
       <header style={{ position: "absolute", top: 0, left: 0, padding: "24px 36px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 28, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
@@ -101,5 +125,6 @@ export default function Page() {
 
       <ProtoControls duet={duet} />
     </main>
+    </>
   );
 }
