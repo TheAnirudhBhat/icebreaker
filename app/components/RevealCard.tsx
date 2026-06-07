@@ -35,7 +35,7 @@ export default function RevealCard({ onReveal, fill = false, name }: { onReveal:
         <img src="/reveal-cover.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-        <span style={{ ...typography.headerH4, color: TEXT_PRIMARY, maxWidth: 200, textWrap: "balance" }}>Your icebreakers are ready</span>
+        <span style={{ ...typography.headerH4, color: TEXT_PRIMARY, maxWidth: 200, textWrap: "balance" }}>{name ? `Your icebreakers with ${name} are ready` : "Your icebreakers are ready"}</span>
         <span style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 14, lineHeight: "20px", color: MAIN_PRIMARY }}>Tap to reveal</span>
       </div>
     </button>
