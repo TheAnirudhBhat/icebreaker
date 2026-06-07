@@ -69,7 +69,7 @@ export default function CommonGroundSheet({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={row.logo} alt="" width={18} height={18} style={{ display: "block", flexShrink: 0, marginTop: 1 }} />
               ) : (
-                <span style={{ fontSize: 18, lineHeight: "18px", flexShrink: 0 }}>{row.emoji}</span>
+                <span style={{ width: 18, height: 20, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, lineHeight: 1, marginTop: 2 }}>{row.emoji}</span>
               )}
               <span style={{ ...typography.bodyNormal, fontSize: 14, lineHeight: "20px", color: TEXT_PRIMARY, flex: 1 }}>{row.text}</span>
             </div>

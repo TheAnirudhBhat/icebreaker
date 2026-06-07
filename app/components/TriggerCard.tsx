@@ -35,7 +35,7 @@ export default function TriggerCard({
                 Break the ice, together
               </h2>
               <p style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 14, lineHeight: "18px", color: TEXT_PRIMARY, margin: 0, padding: "0 8px" }}>
-                Connect your apps, both answer a few questions, &amp; see what&apos;s unique &amp; common between you.
+                Connect your music and social apps, both answer a few questions, then see what you have in common.
               </p>
             </div>
 

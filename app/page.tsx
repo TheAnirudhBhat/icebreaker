@@ -101,11 +101,19 @@ function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) 
   useEffect(() => {
     if (open) {
       setMounted(true);
-      const r = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(r);
+      // Double rAF: paint at opacity 0 first so the enter transition actually runs,
+      // instead of the browser batching both commits into one frame (an instant pop).
+      let raf2 = 0;
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => setVisible(true));
+      });
+      return () => {
+        cancelAnimationFrame(raf1);
+        cancelAnimationFrame(raf2);
+      };
     }
     setVisible(false);
-    const t = window.setTimeout(() => setMounted(false), 260);
+    const t = window.setTimeout(() => setMounted(false), 340);
     return () => window.clearTimeout(t);
   }, [open]);
   useEffect(() => {
@@ -137,7 +145,7 @@ function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) 
           border: `1px solid ${OUTLINE_SUBTLE}`,
           borderRadius: 24,
           boxShadow: "0 44px 110px -36px rgba(26,22,20,0.5)",
-          padding: "52px 60px 40px",
+          padding: "52px 60px 60px",
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0) scale(1)" : "translateY(10px) scale(0.985)",
           transition: "opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease)",
