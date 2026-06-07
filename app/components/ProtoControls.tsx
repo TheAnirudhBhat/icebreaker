@@ -33,8 +33,8 @@ export default function ProtoControls({ duet }: { duet: Duet }) {
 
   return (
     <div style={{ position: "fixed", top: "50%", right: 0, transform: "translateY(-50%)", zIndex: 60, display: "flex", alignItems: "center" }}>
-      {/* one-time discovery tag, sits just left of the grip and fades away */}
-      <div
+      {/* one-time discovery hint: plain text just left of the grip, fades away */}
+      <span
         aria-hidden
         style={{
           position: "absolute",
@@ -45,21 +45,15 @@ export default function ProtoControls({ duet }: { duet: Duet }) {
           transition: "opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease)",
           pointerEvents: "none",
           whiteSpace: "nowrap",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          background: BG_CARD,
-          border: `1px solid ${OUTLINE_SUBTLE}`,
-          borderRadius: 999,
-          boxShadow: "0 8px 22px -10px rgba(26,22,20,0.3)",
-          padding: "7px 13px",
+          fontFamily: FONT_SANS,
+          fontWeight: 500,
+          fontSize: 13,
+          lineHeight: "16px",
+          color: TEXT_SECONDARY,
         }}
       >
-        <span style={{ fontFamily: FONT_SANS, fontWeight: 500, fontSize: 12, lineHeight: "16px", color: TEXT_SECONDARY }}>Jump to a state</span>
-        <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
-          <path d="M6 4l5 5-5 5" stroke={TEXT_TERTIARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </div>
+        Jump to a state
+      </span>
 
       <button
         type="button"

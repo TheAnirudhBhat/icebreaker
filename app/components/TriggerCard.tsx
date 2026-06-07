@@ -12,7 +12,7 @@ const FEATHER = "radial-gradient(ellipse 86% 84% at 50% 48%, #000 70%, transpare
 const PROPS: { crop: CSSProperties; title: string }[] = [
   { crop: { height: "710.78%", left: "-43.19%", top: "-95.86%", width: "1068.08%" }, title: "See the music you both love" },
   { crop: { height: "705.24%", left: "-40.36%", top: "-300.73%", width: "1064.66%" }, title: "Find the friends you share" },
-  { crop: { height: "703.14%", left: "-40.36%", top: "-511.52%", width: "1064.66%" }, title: "Spot the places you both love" },
+  { crop: { height: "703.14%", left: "-40.36%", top: "-511.52%", width: "1064.66%" }, title: "See the places you'd both love" },
 ];
 
 // Full-screen explainer for Icebreaker, opened from the in-chat nudge. It sells the

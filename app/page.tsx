@@ -12,7 +12,7 @@ import { ME, AANYA } from "./data/match";
 // Margin annotation shown OUTSIDE the phone shell while the first device is on the
 // connect screen, explaining the webview auth we skipped. Handwriting, text only.
 const CONNECT_NOTE =
-  "Tapping Connect opens a webview to sign in and authorize each app to share its info with Hinge. Skipped here for the proto.\n\nYou only see this screen the first time.";
+  "Tapping Connect opens a webview to sign in and authorize each app to share its info with Hinge. Skipped here for the proto.\n\nYou only see this screen the first time you use this feature.";
 
 // Trigger-timing annotation for the in-chat nudge (timings are a starting guess).
 const NUDGE_NOTE =
