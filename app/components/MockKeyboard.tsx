@@ -70,7 +70,7 @@ export default function MockKeyboard({ visible }: { visible: boolean }) {
         borderBottom: "none",
         overflow: "hidden",
         transform: visible ? "translateY(0)" : "translateY(100%)",
-        transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "transform var(--dur-base) var(--ease)",
       }}
     >
       <div

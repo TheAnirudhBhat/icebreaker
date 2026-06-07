@@ -52,6 +52,17 @@
   /* Brand */
   --plum: #6d3ba4;
   --rose: #e2566f;
+
+  /* Motion: Hinge DLS easing + its overshoot variant. */
+  --ease: cubic-bezier(0.5, 0, 0.09, 1);
+  --ease-pop: cubic-bezier(0.5, 1.02, 0.22, 1);
+
+  /* Motion durations (paired with --ease). Same interaction type shares one. */
+  --dur-micro: 0.2s;
+  --dur-base: 0.3s;
+  --dur-entrance: 0.45s;
+  --dur-emphasis: 0.6s;
+  --dur-hero: 0.75s;
 }
 
 @theme inline {
@@ -128,10 +139,10 @@ body {
 
 /* ============ CLASSES ============ */
 
-.anim-fade-in { animation: fadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-fade-in { animation: fadeIn var(--dur-base) var(--ease) both; }
 
 @keyframes softIn { from { opacity: 0; } to { opacity: 1; } }
-.anim-soft-in { animation: softIn 0.26s ease both; }
+.anim-soft-in { animation: softIn var(--dur-micro) var(--ease) both; }
 @media (prefers-reduced-motion: reduce) { .anim-soft-in { animation: none; } }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -142,12 +153,12 @@ body {
 @media (prefers-reduced-motion: reduce) { .anim-wave-drift { animation: none; } }
 
 @keyframes cardExpandOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.18); opacity: 0; } }
-.anim-card-expand-out { animation: cardExpandOut 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.anim-card-expand-out { animation: cardExpandOut var(--dur-base) var(--ease) forwards; }
 @media (prefers-reduced-motion: reduce) { .anim-card-expand-out { animation: none; opacity: 0; } }
 
 /* gentle horizontal push for stepping between screens / questions */
 @keyframes pushInRight { from { opacity: 0; transform: translateX(44px); } to { opacity: 1; transform: translateX(0); } }
-.anim-push-in { animation: pushInRight 0.58s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-push-in { animation: pushInRight var(--dur-emphasis) var(--ease) both; }
 @media (prefers-reduced-motion: reduce) { .anim-push-in { animation: none; } }
 
 /* reveal cover: skew up, then toss off to the side */
@@ -156,21 +167,25 @@ body {
   32% { transform: perspective(720px) rotateX(-24deg) translate(0, -14px) rotate(0deg) scale(1.05); box-shadow: 0 34px 46px -18px rgba(36,18,57,0.55); opacity: 1; }
   100% { transform: perspective(720px) rotateX(-12deg) translate(200px, 150px) rotate(12deg) scale(0.86); box-shadow: 0 50px 50px -24px rgba(36,18,57,0.25); opacity: 0; }
 }
-.anim-card-toss { animation: cardToss 0.6s cubic-bezier(0.4, 0, 0.4, 1) forwards; }
+.anim-card-toss { animation: cardToss var(--dur-emphasis) var(--ease) forwards; }
 @media (prefers-reduced-motion: reduce) { .anim-card-toss { animation: none; opacity: 0; } }
 
 /* push notification dropping in from the top */
 @keyframes pushDownIn { from { opacity: 0; transform: translateY(-130%); } to { opacity: 1; transform: translateY(0); } }
-.anim-push-down { animation: pushDownIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-push-down { animation: pushDownIn var(--dur-entrance) var(--ease) both; }
 @media (prefers-reduced-motion: reduce) { .anim-push-down { animation: none; } }
+
+/* push notification sliding back off the top to dismiss (drives onAnimationEnd) */
+@keyframes pushUpOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-130%); } }
+.anim-push-up { animation: pushUpOut var(--dur-base) var(--ease) forwards; }
 
 /* in-chat nudge rising into place */
 @keyframes nudgeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-.anim-nudge-up { animation: nudgeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-nudge-up { animation: nudgeUp var(--dur-emphasis) var(--ease) both; }
 @media (prefers-reduced-motion: reduce) { .anim-nudge-up { animation: none; } }
-.anim-chat-in { animation: chatIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.anim-sheet-up { animation: sheetUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.anim-backdrop-in { animation: backdropIn 0.28s ease both; }
+.anim-chat-in { animation: chatIn var(--dur-entrance) var(--ease) both; }
+.anim-sheet-up { animation: sheetUp var(--dur-entrance) var(--ease) both; }
+.anim-backdrop-in { animation: backdropIn var(--dur-base) var(--ease) both; }
 
 @keyframes sheetDown {
   from { transform: translateY(0); }
@@ -180,16 +195,20 @@ body {
   from { opacity: 1; }
   to { opacity: 0; }
 }
-.anim-sheet-down { animation: sheetDown 0.34s cubic-bezier(0.4, 0, 1, 1) both; }
-.anim-backdrop-out { animation: backdropOut 0.34s ease both; }
+.anim-sheet-down { animation: sheetDown var(--dur-entrance) var(--ease) both; }
+.anim-backdrop-out { animation: backdropOut var(--dur-base) var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-sheet-down { animation: none; opacity: 0; }
   .anim-backdrop-out { animation: none; opacity: 0; }
 }
-.anim-reveal-pop { animation: revealPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.anim-reveal-pop { animation: revealPop var(--dur-entrance) var(--ease-pop) both; }
 .anim-soft-float { animation: softFloat 5s ease-in-out infinite; }
 .anim-heartbeat { animation: heartBeat 0.9s ease-in-out; }
+
+/* one-time attention pulse for the debug drawer grip (nudges it toward the edge) */
+@keyframes gripTug { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3px); } }
+.anim-grip-tug { animation: gripTug 1.8s var(--ease) infinite; }
 
 .typing-dot {
   width: 6px;
@@ -208,7 +227,7 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--dur-emphasis) var(--ease);
   transform-style: preserve-3d;
 }
 .flip-card.is-flipped .flip-inner {
@@ -242,15 +261,15 @@ body {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.anim-q-in { animation: qIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.anim-option-in { animation: optionIn 0.44s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-q-in { animation: qIn var(--dur-entrance) var(--ease) both; }
+.anim-option-in { animation: optionIn var(--dur-entrance) var(--ease) both; }
 
 /* send button revealing from the right as the input narrows */
 @keyframes growBtn {
   from { width: 0; }
   to { width: 54px; }
 }
-.anim-grow-btn { animation: growBtn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-grow-btn { animation: growBtn var(--dur-base) var(--ease) both; }
 @media (prefers-reduced-motion: reduce) {
   .anim-grow-btn { animation: none; width: 54px; }
 }
@@ -277,19 +296,19 @@ body {
   0% { opacity: 0; transform: translateY(16px) scale(0.96); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-.anim-card-pop { animation: cardPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-card-pop { animation: cardPop var(--dur-emphasis) var(--ease) both; }
 
 @keyframes avatarsIn {
   0% { opacity: 0; transform: scale(0.86); }
   100% { opacity: 1; transform: scale(1); }
 }
-.anim-avatars-in { animation: avatarsIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-avatars-in { animation: avatarsIn var(--dur-emphasis) var(--ease) both; }
 
 @keyframes countPop {
   0% { opacity: 0; transform: scale(0.92); }
   100% { opacity: 1; transform: scale(1); }
 }
-.anim-count-pop { animation: countPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-count-pop { animation: countPop var(--dur-entrance) var(--ease) both; }
 
 @keyframes sparkleFly {
   0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a, 0deg)) translateY(0) scale(0.2); }
@@ -301,7 +320,7 @@ body {
   left: 50%;
   top: 50%;
   pointer-events: none;
-  animation: sparkleFly 0.9s ease-out both;
+  animation: sparkleFly 0.9s var(--ease) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -323,7 +342,7 @@ body {
   0% { transform: perspective(1100px) rotateY(0deg); opacity: 1; }
   100% { transform: perspective(1100px) rotateY(90deg); opacity: 0; }
 }
-.anim-card-flip-open { animation: cardFlipOpen 0.4s cubic-bezier(0.4, 0, 0.5, 1) forwards; }
+.anim-card-flip-open { animation: cardFlipOpen var(--dur-base) var(--ease) forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-card-glow { animation: none; }
@@ -335,14 +354,14 @@ body {
   25% { transform: translateX(-3px) rotate(-0.5deg); }
   75% { transform: translateX(3px) rotate(0.5deg); }
 }
-.anim-ice-shake { animation: iceShake 0.2s ease; }
+.anim-ice-shake { animation: iceShake var(--dur-micro) var(--ease); }
 
 @keyframes iceShatter {
   0% { transform: scale(1) rotate(0deg); opacity: 1; }
   40% { transform: scale(1.04) rotate(-1deg); opacity: 1; }
   100% { transform: scale(1.16) rotate(2deg); opacity: 0; }
 }
-.anim-ice-shatter { animation: iceShatter 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.anim-ice-shatter { animation: iceShatter var(--dur-entrance) var(--ease) forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-ice-shake,
@@ -355,7 +374,7 @@ body {
   18% { transform: scale(0.99); }
   100% { opacity: 0; transform: scale(1.05); }
 }
-.anim-ice-crack { animation: iceCrack 0.44s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.anim-ice-crack { animation: iceCrack var(--dur-entrance) var(--ease) forwards; }
 @media (prefers-reduced-motion: reduce) {
   .anim-ice-crack { animation: none; opacity: 0; }
 }
@@ -366,19 +385,19 @@ body {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.rev-fade { animation: revFade 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.rev-fade { animation: revFade var(--dur-entrance) var(--ease) both; }
 
 @keyframes revBlur {
   from { opacity: 0; filter: blur(7px); }
   to { opacity: 1; filter: blur(0); }
 }
-.rev-blur { animation: revBlur 0.55s ease both; }
+.rev-blur { animation: revBlur var(--dur-emphasis) var(--ease) both; }
 
 @keyframes revUnfurl {
   from { clip-path: inset(0 0 100% 0); opacity: 0.5; }
   to { clip-path: inset(0 0 0 0); opacity: 1; }
 }
-.anim-unfurl { animation: revUnfurl 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-unfurl { animation: revUnfurl var(--dur-emphasis) var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .rev-fade,
@@ -390,19 +409,19 @@ body {
   from { transform: rotateY(0deg); opacity: 1; }
   to { transform: rotateY(90deg); opacity: 0; }
 }
-.anim-flip-out { animation: flipOut 0.32s ease-in both; transform-origin: center; }
+.anim-flip-out { animation: flipOut var(--dur-base) var(--ease) both; transform-origin: center; }
 
 @keyframes flipIn {
   from { transform: rotateY(-90deg); opacity: 0; }
   to { transform: rotateY(0deg); opacity: 1; }
 }
-.anim-flip-in { animation: flipIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: center; }
+.anim-flip-in { animation: flipIn var(--dur-entrance) var(--ease) both; transform-origin: center; }
 
 @keyframes expandIn {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
-.anim-expand-in { animation: expandIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-expand-in { animation: expandIn var(--dur-entrance) var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-flip-out,

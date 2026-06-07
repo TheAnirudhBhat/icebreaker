@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SONG_PROMPT, pickDeck, type Prompt } from "../data/prompts";
 import { musicConnected, type ServiceId } from "../data/connects";
 import { AANYA_ANSWERS, AANYA_CONNECTED, NONE_CONNECTED, type Answer } from "../data/match";
@@ -47,13 +47,27 @@ export function useDuet() {
   const [usedIds, setUsedIds] = useState<string[]>([]);
   const [revealStyle, setRevealStyle] = useState<"flip" | "ice" | "stretch">("flip");
   const [revealNonce, setRevealNonce] = useState(0);
+  // Debug-only: jump to the face-down "tap to reveal" state without auto-opening it.
+  const [readyNonce, setReadyNonce] = useState(0);
   const [revealAnim, setRevealAnim] = useState<"flip" | "expand" | "fade">("fade");
   // Bottom-sheet shell: Hinge-style bottom-anchored ("sheet") vs the original floating card.
   const [sheetStyle, setSheetStyle] = useState<"sheet" | "floating">("sheet");
   // The first device to reach the connect screen shows the out-of-frame explainer.
   const [firstConnector, setFirstConnector] = useState<PlayerId | null>(null);
-  // The device whose connect screen is running the generate loader (hides the note).
-  const [generatingId, setGeneratingId] = useState<PlayerId | null>(null);
+  // Which phones are running the generate loader, tracked per-phone (not a single id)
+  // so the second phone's loader can't un-hide the first phone's connect note: in this
+  // two-phone proto both loaders can run at the same time.
+  const [generating, setGenerating] = useState<Record<PlayerId, boolean>>({ me: false, aanya: false });
+  // Proto-only: which phone just tapped "Write my own" (free-text entry isn't wired
+  // up), so the page can show an out-of-frame note explaining the limitation.
+  const [writeOwnId, setWriteOwnId] = useState<PlayerId | null>(null);
+  const writeOwnTimer = useRef<number | null>(null);
+  // Surface the proto note, then auto-clear it after 10s so it doesn't linger.
+  const flagWriteOwn = useCallback((pid: PlayerId) => {
+    setWriteOwnId(pid);
+    if (writeOwnTimer.current) window.clearTimeout(writeOwnTimer.current);
+    writeOwnTimer.current = window.setTimeout(() => setWriteOwnId(null), 10000);
+  }, []);
 
   useEffect(() => setSeed(randomSeed()), []);
 
@@ -101,25 +115,26 @@ export function useDuet() {
 
   const startGame = useCallback((pid: PlayerId) => {
     setFirstConnector((f) => f ?? pid);
-    setGeneratingId(null);
+    setGenerating((s) => ({ ...s, [pid]: false }));
     setter(pid)((prev) => ({ ...prev, phase: "connect", connected: { ...NONE_CONNECTED }, index: 0, answers: {}, submitted: false }));
   }, []);
 
   // ConnectStep calls this when the generate/skip CTA is tapped, so the out-of-frame
   // explainer can disappear immediately (before the loader finishes).
-  const beginGenerating = useCallback((pid: PlayerId) => setGeneratingId(pid), []);
+  const beginGenerating = useCallback((pid: PlayerId) => setGenerating((s) => ({ ...s, [pid]: true })), []);
 
   const toggleConnect = useCallback((pid: PlayerId, service: ServiceId) => {
     setter(pid)((prev) => ({ ...prev, connected: { ...prev.connected, [service]: !prev.connected[service] } }));
   }, []);
 
   const finishConnect = useCallback((pid: PlayerId) => {
-    setGeneratingId(null);
+    setGenerating((s) => ({ ...s, [pid]: false }));
     setter(pid)((prev) => ({ ...prev, phase: "playing", index: 0 }));
   }, []);
 
   const answer = useCallback(
     (pid: PlayerId, promptId: string, ans: Answer) => {
+      setWriteOwnId(null);
       setter(pid)((prev) => {
         const answers = { ...prev.answers, [promptId]: ans };
         const vis = visibleFor(prev.connected);
@@ -136,6 +151,7 @@ export function useDuet() {
   }, []);
 
   const dismiss = useCallback((pid: PlayerId) => {
+    setWriteOwnId(null);
     setter(pid)((prev) => ({ ...prev, phase: "dismissed", index: 0, answers: {}, submitted: false }));
   }, []);
 
@@ -182,13 +198,16 @@ export function useDuet() {
     setAanya(initialPlayer());
     setMessages([]);
     setFirstConnector(null);
-    setGeneratingId(null);
+    setGenerating({ me: false, aanya: false });
+    setWriteOwnId(null);
   }, []);
 
   // Debug: jump the "me" phone straight to a state for quick testing.
   const debugJump = useCallback(
-    (target: "silent" | "trigger" | "connect" | "questions" | "sealed" | "reveal") => {
+    (target: "silent" | "trigger" | "connect" | "questions" | "sealed" | "ready" | "reveal") => {
       setMessages([]);
+      setWriteOwnId(null);
+      setGenerating({ me: false, aanya: false });
       if (target === "silent") {
         setSeed(randomSeed());
         setUsedIds([]);
@@ -214,6 +233,14 @@ export function useDuet() {
       if (target === "sealed") {
         setMe({ phase: "sealed", connected: { ...AANYA_CONNECTED }, index: 0, answers: { ...AANYA_ANSWERS }, submitted: true });
         setAanya({ ...initialPlayer(), phase: "trigger" });
+        return;
+      }
+      if (target === "ready") {
+        // both answered, reveal card face-down: the "tap to reveal" state, not yet opened
+        const ready = { phase: "chat" as const, connected: { ...AANYA_CONNECTED }, index: 0, answers: { ...AANYA_ANSWERS }, submitted: true };
+        setMe(ready);
+        setAanya(ready);
+        setReadyNonce((n) => n + 1);
         return;
       }
       // reveal: both played + reveal already open
@@ -246,13 +273,16 @@ export function useDuet() {
     revealStyle,
     setRevealStyle,
     revealNonce,
+    readyNonce,
     revealAnim,
     setRevealAnim,
     sheetStyle,
     setSheetStyle,
     firstConnector,
-    generatingId,
+    generating,
     beginGenerating,
+    writeOwnId,
+    flagWriteOwn,
     debugJump,
   };
 }

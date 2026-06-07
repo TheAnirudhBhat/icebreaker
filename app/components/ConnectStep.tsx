@@ -109,7 +109,7 @@ export default function ConnectStep({
   if (generating) {
     return (
       <div key="gen" className="anim-push-in" style={{ display: "flex", flexDirection: "column", height: "100%", background: BG_SHEET }}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: "24px", paddingBottom: 150, opacity: lottieReady ? 1 : 0, transition: "opacity 0.45s ease" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: "24px", paddingBottom: 150, opacity: lottieReady ? 1 : 0, transition: "opacity var(--dur-entrance) var(--ease)" }}>
           <div style={{ width: 150, height: 124, display: "flex" }}>
             <Lottie animationData={hingeLoader} loop autoplay onDOMLoaded={() => setLottieReady(true)} onLoopComplete={handleLoop} style={{ width: "100%", height: "100%" }} />
           </div>
@@ -149,7 +149,9 @@ export default function ConnectStep({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={s.logo} alt="" width={32} height={32} style={{ display: "block", flexShrink: 0 }} />
                       <span style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
-                        <span style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 14, lineHeight: "20px", color: "#2C2827" }}>{s.name}</span>
+                        {/* Modern Era ships no Semibold; a 0.2px same-color stroke fakes
+                            the Figma weight (jugaad) without a heavier font cut. */}
+                        <span style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 14, lineHeight: "20px", color: "#2C2827", WebkitTextStroke: "0.2px #2C2827" }}>{s.name}</span>
                         <span style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 12, lineHeight: "16px", color: TEXT_SECONDARY }}>{s.unlocks}</span>
                       </span>
                     </span>

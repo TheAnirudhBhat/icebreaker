@@ -4,15 +4,13 @@ import { useMemo } from "react";
 import { typography } from "../lib/typography";
 import { RADIUS_M } from "../lib/radii";
 import { TEXT_PRIMARY, TEXT_TERTIARY } from "../lib/colors";
-import { commonGround, revealRows } from "../lib/insights";
+import { mockIcebreakers } from "../lib/insights";
 import type { PlayerState } from "../hooks/useDuet";
 
 // The reveal: a light card of things to go on, a mix of real facts about them and
 // where you two line up. In `preview` mode it renders statically (no entrance
 // animation, no outer margin) so it can sit behind the opener.
 export default function CommonGroundDetails({
-  selfState,
-  otherState,
   otherName,
   variant,
   preview = false,
@@ -28,12 +26,9 @@ export default function CommonGroundDetails({
   const tappable = !!onExpand;
   const enterClass = preview ? "" : variant === "flip" ? "anim-flip-in" : variant === "expand" ? "anim-expand-in" : "rev-fade";
 
-  // Only what's fair to show a match: shared overlaps and the answers you both
-  // gave, each reframed as something to actually talk about. No private inferences.
-  const rows = useMemo(() => {
-    const cg = commonGround(selfState.connected, selfState.answers, otherState.connected, otherState.answers);
-    return revealRows(cg, otherName);
-  }, [selfState, otherState, otherName]);
+  // Proto showcase: a hand-picked set of best-case icebreakers (see mockIcebreakers)
+  // so the reveal always reads well; the expanded sheet shows the full list.
+  const rows = useMemo(() => mockIcebreakers(otherName).slice(0, 3), [otherName]);
 
   return (
     <div className={preview ? "" : "anim-chat-in"} style={{ padding: preview ? 0 : "8px 16px 6px" }}>

@@ -1,5 +1,5 @@
 import { sharedOverlaps, musicConnected, type Overlap, type ServiceId } from "../data/connects";
-import { ALL_PROMPTS, matchPhraseFor, topicFor } from "../data/prompts";
+import { ALL_PROMPTS, matchPhraseFor, topicFor, subjectFor } from "../data/prompts";
 import type { Answer } from "../data/match";
 
 export type AnswerPair = {
@@ -148,7 +148,7 @@ const MATCHED_STATEMENTS: Record<string, string> = {
   "gig:indie": "You'd both pick a sweaty indie set over anything seated.",
   "gig:djset": "You'd both rather be at a late DJ set than anywhere with chairs.",
   "gig:jazz": "You'd both happily spend the night in a tiny jazz bar.",
-  "repeat:feels": "You're both on a 'something to feel things to' kick right now.",
+  "repeat:feels": "You both keep emotional, feel-everything songs on heavy repeat.",
   "repeat:hype": "You both keep pure pre-game hype on heavy repeat.",
   "repeat:throwback": "You're both unapologetically deep in throwbacks lately.",
   "saturday:trail": "You'd both rather be out on a trail by 8 than anywhere else.",
@@ -202,7 +202,7 @@ export function revealRows(cg: CommonGround, otherName: string, limit = 3): Reve
     .forEach((p) =>
       out.push({
         emoji: p.mine.emoji,
-        text: `You went with ${p.mine.label.toLowerCase()}, ${otherName} with ${p.theirs.label.toLowerCase()}. A fun first debate.`,
+        text: `On ${subjectFor(p.id)}, you went with ${p.mine.label.toLowerCase()}, ${otherName} with ${p.theirs.label.toLowerCase()}. A fun first debate.`,
       })
     );
 
@@ -214,4 +214,19 @@ export function revealRows(cg: CommonGround, otherName: string, limit = 3): Reve
   const rows = out.slice(0, limit);
   rows.push({ emoji: "💡", text: dateIdea(cg) });
   return rows;
+}
+
+// A curated, always-strong set of icebreakers for the reveal. A real build can't
+// reliably compute lines this good every time, so the proto shows a hand-picked
+// mock to represent the best-case output. Kept symmetric (true for both people) so
+// it reads correctly on either phone, with the date idea as the closer.
+export function mockIcebreakers(otherName: string): RevealRow[] {
+  return [
+    { emoji: "🎧", logo: "/logos/spotify.svg", text: "The Weeknd is top 5 for you both, and 'Blinding Lights' is in both your heavy rotations." },
+    { emoji: "📷", logo: "/logos/instagram.svg", text: `You and ${otherName} share 4 mutual follows, Rhea Mehta and Karan Shah among them.` },
+    { emoji: "😂", text: "You both fall a little for people who can make you laugh mid-argument." },
+    { emoji: "🌧️", text: "You've both had emotional, feel-everything songs on repeat lately." },
+    { emoji: "🥾", text: "You'd both rather be out on a trail by 8 than anywhere else on a Saturday." },
+    { emoji: "💡", text: "A sunrise walk in Cubbon Park, then filter coffee at Third Wave." },
+  ];
 }

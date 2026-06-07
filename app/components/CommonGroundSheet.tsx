@@ -5,7 +5,7 @@ import { typography } from "../lib/typography";
 import { TEXT_PRIMARY, BG_SHEET } from "../lib/colors";
 import { NavButton } from "./AppChrome";
 import Avatar from "./Avatar";
-import { commonGround, revealRows } from "../lib/insights";
+import { mockIcebreakers } from "../lib/insights";
 import type { PlayerState } from "../hooks/useDuet";
 import type { Person } from "../data/match";
 
@@ -14,8 +14,6 @@ import type { Person } from "../data/match";
 // content (GameSheet caps + scrolls only if it ever overflows a page), so a short
 // reveal reads as a small sheet rather than a forced full screen.
 export default function CommonGroundSheet({
-  selfState,
-  otherState,
   selfPerson,
   otherPerson,
   otherName,
@@ -28,12 +26,8 @@ export default function CommonGroundSheet({
   otherName: string;
   onClose: () => void;
 }) {
-  const cg = useMemo(
-    () => commonGround(selfState.connected, selfState.answers, otherState.connected, otherState.answers),
-    [selfState, otherState]
-  );
-  // Same row list as the inline reveal card, just a few more rows.
-  const rows = useMemo(() => revealRows(cg, otherName, 6), [cg, otherName]);
+  // Same hand-picked icebreakers as the inline reveal card, shown in full here.
+  const rows = useMemo(() => mockIcebreakers(otherName), [otherName]);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -51,7 +45,7 @@ export default function CommonGroundSheet({
 
   return (
     <div ref={rootRef} style={{ background: BG_SHEET, display: "flex", flexDirection: "column" }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 5, background: BG_SHEET, display: "flex", justifyContent: "flex-end", padding: "8px 10px 4px", boxShadow: scrolled ? "0 4px 12px -6px rgba(26,22,20,0.22)" : "none", transition: "box-shadow 0.2s ease" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 5, background: BG_SHEET, display: "flex", justifyContent: "flex-end", padding: "8px 10px 4px", boxShadow: scrolled ? "0 4px 12px -6px rgba(26,22,20,0.22)" : "none", transition: "box-shadow var(--dur-micro) var(--ease)" }}>
         <NavButton kind="close" onClick={onClose} ariaLabel="Close" />
       </div>
 

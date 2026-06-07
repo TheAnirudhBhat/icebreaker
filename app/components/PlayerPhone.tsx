@@ -39,78 +39,41 @@ const KEYBOARD_HEIGHT = 300;
 
 // A Hinge iOS push that drops in below the Dynamic Island the moment the other
 // person submits their answers.
-function PushBanner({ body, onTap, onDismiss }: { body: string; onTap: () => void; onDismiss: () => void }) {
-  // iOS-style banner: drag up past a threshold flings it off the top and dismisses;
-  // a small drag snaps back; a plain tap opens the Icebreaker.
-  const [dy, setDy] = useState(0);
-  const [dragging, setDragging] = useState(false);
+function PushBanner({ body, onDismiss, screenRef }: { body: string; onDismiss: () => void; screenRef: React.RefObject<HTMLDivElement | null> }) {
+  // A Hinge iOS push that drops in, then cleanly slides away. It never blocks the
+  // screen: a tap anywhere on THIS phone dismisses it via a listener that doesn't
+  // swallow the tap (so the tapped element still does its thing). Tapping the banner
+  // and the auto-timer also dismiss it.
   const [exiting, setExiting] = useState(false);
-  const [touched, setTouched] = useState(false);
-  const startY = useRef(0);
-  const moved = useRef(false);
 
-  // iOS temp banners auto-dismiss after a few seconds; slide it away on a timer
-  // unless the user has already grabbed it.
   useEffect(() => {
-    if (touched) return;
-    const t = window.setTimeout(() => {
-      setTouched(true);
-      setExiting(true);
-    }, 8000);
+    const t = window.setTimeout(() => setExiting(true), 8000);
     return () => window.clearTimeout(t);
-  }, [touched]);
+  }, []);
+
+  useEffect(() => {
+    const el = screenRef.current;
+    if (!el) return;
+    const onDown = () => setExiting(true);
+    // Attach a tick late so the state change that mounts the banner can't dismiss it instantly.
+    const t = window.setTimeout(() => el.addEventListener("pointerdown", onDown), 50);
+    return () => {
+      window.clearTimeout(t);
+      el.removeEventListener("pointerdown", onDown);
+    };
+  }, [screenRef]);
 
   return (
     <div
-      className={touched ? undefined : "anim-push-down"}
-      onPointerDown={(e) => {
-        startY.current = e.clientY;
-        moved.current = false;
-        setTouched(true);
-        setDragging(true);
-        e.currentTarget.setPointerCapture(e.pointerId);
+      onClick={() => setExiting(true)}
+      onAnimationEnd={() => {
+        if (exiting) onDismiss();
       }}
-      onPointerMove={(e) => {
-        if (!dragging) return;
-        const d = e.clientY - startY.current;
-        if (Math.abs(d) > 6) moved.current = true;
-        setDy(Math.min(0, d)); // only allow upward travel
-      }}
-      onPointerUp={() => {
-        if (!dragging) return;
-        setDragging(false);
-        if (dy < -36) setExiting(true);
-        else {
-          setDy(0);
-          if (!moved.current) onTap();
-        }
-      }}
-      onPointerCancel={() => {
-        setDragging(false);
-        setDy(0);
-      }}
-      onTransitionEnd={(e) => {
-        if (exiting && e.propertyName === "transform") onDismiss();
-      }}
-      style={{
-        position: "absolute",
-        top: 56,
-        left: 10,
-        right: 10,
-        zIndex: 52,
-        touchAction: "none",
-        transform: touched ? `translateY(${exiting ? -180 : dy}px)` : undefined,
-        opacity: exiting ? 0 : 1,
-        transition: dragging ? "none" : "transform 0.32s cubic-bezier(0.4, 0, 1, 1), opacity 0.3s ease",
-      }}
+      className={exiting ? "anim-push-up" : "anim-push-down"}
+      style={{ position: "absolute", top: 56, left: 10, right: 10, zIndex: 52, cursor: "pointer" }}
     >
-      <button
-        type="button"
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onTap();
-        }}
-        className="transition-transform active:scale-[0.99]"
-        style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 11, background: "rgba(250,250,252,0.98)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 22, padding: "12px 14px", boxShadow: "0 22px 46px -16px rgba(26,22,20,0.5)", cursor: "pointer" }}
+      <div
+        style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 11, background: "rgba(250,250,252,0.98)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 22, padding: "12px 14px", boxShadow: "0 22px 46px -16px rgba(26,22,20,0.5)" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hinge-icon.png" alt="Hinge" width={40} height={40} style={{ display: "block", flexShrink: 0, borderRadius: 10 }} />
@@ -123,7 +86,7 @@ function PushBanner({ body, onTap, onDismiss }: { body: string; onTap: () => voi
             {body}
           </div>
         </div>
-      </button>
+      </div>
     </div>
   );
 }
@@ -141,7 +104,7 @@ function SystemNote({ text }: { text: string }) {
 function MeBubble({ text }: { text: string }) {
   return (
     <div className="anim-chat-in" style={{ display: "flex", justifyContent: "flex-end", padding: "3px 16px" }}>
-      <div style={{ ...typography.bodyNormal, color: ALPHA_WHITE_FF, background: MAIN_PRIMARY, borderRadius: 20, borderBottomRightRadius: 6, padding: "9px 14px", maxWidth: "76%" }}>
+      <div style={{ ...typography.bodyNormal, color: ALPHA_WHITE_FF, background: MAIN_PRIMARY, borderRadius: 8, borderBottomRightRadius: 0, padding: "8px 14px", maxWidth: "76%" }}>
         {text}
       </div>
     </div>
@@ -152,7 +115,7 @@ function TheirBubble({ text, person }: { text: string; person: Person }) {
   return (
     <div className="anim-chat-in" style={{ display: "flex", alignItems: "flex-end", gap: 4, padding: "3px 16px 3px 14px" }}>
       <Avatar name={person.name} gradient={person.gradient} size={24} photo={person.photo} />
-      <div style={{ ...typography.bodyNormal, color: TEXT_PRIMARY, background: "#EEEEEE", borderRadius: 20, borderBottomLeftRadius: 6, padding: "9px 14px", maxWidth: "72%" }}>
+      <div style={{ ...typography.bodyNormal, color: TEXT_PRIMARY, background: "#EEEEEE", borderRadius: 8, borderBottomLeftRadius: 0, padding: "8px 14px", maxWidth: "72%" }}>
         {text}
       </div>
     </div>
@@ -161,10 +124,10 @@ function TheirBubble({ text, person }: { text: string; person: Person }) {
 
 // A chat day/time separator (Figma 107-2139): Modern Era 12px, #AFADAB, centered.
 // Sits above each card that drops into the thread (nudge, sealed wait, reveal).
-function ChatTimestamp() {
+function ChatTimestamp({ time = "1:45 PM" }: { time?: string }) {
   return (
     <p style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 12, lineHeight: "16px", color: "#AFADAB", textAlign: "center", margin: 0 }}>
-      Today 1:45 PM
+      <span style={{ fontWeight: 600 }}>Today</span> {time}
     </p>
   );
 }
@@ -186,6 +149,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
   const prevOtherSubmitted = useRef(other.submitted);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
 
   // The message box stays visible throughout (the sheets float over the chat).
   // It only hides during the deep game steps where the sheet is the whole focus.
@@ -243,6 +207,16 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
     if (duet.revealNonce > 0) setRevealed(true);
   }, [duet.revealNonce]);
 
+  // Debug "Tap to reveal" jump: land on the face-down card, and suppress the ready
+  // push (both phones flip to submitted at once, which isn't the "you were waiting" case).
+  useEffect(() => {
+    if (duet.readyNonce > 0) {
+      setRevealed(false);
+      setReadyPush(false);
+      prevOtherSubmitted.current = true;
+    }
+  }, [duet.readyNonce]);
+
   // A swiped-away push stays gone until the condition clears (you play, or a new
   // round), at which point a fresh push may surface again.
   useEffect(() => {
@@ -258,25 +232,22 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
   };
 
   return (
-    <div style={{ height: "100%", position: "relative", background: BG_PRIMARY, overflow: "hidden" }}>
+    <div ref={phoneRef} style={{ height: "100%", position: "relative", background: BG_PRIMARY, overflow: "hidden" }}>
       {pushVisible && !pushDismissed && (
         <PushBanner
           body={`${otherPerson.name} started a conversation with Icebreaker. Answer yours to reveal.`}
-          onTap={() => duet.startIntro(selfId)}
           onDismiss={() => setPushDismissed(true)}
+          screenRef={phoneRef}
         />
       )}
       {readyPush && (
         <PushBanner
           body={`${otherPerson.name} answered too. Your Icebreaker is ready.`}
-          onTap={() => {
-            setRevealed(true);
-            setReadyPush(false);
-          }}
           onDismiss={() => setReadyPush(false)}
+          screenRef={phoneRef}
         />
       )}
-      <div style={{ height: "100%", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? KEYBOARD_HEIGHT : 0, transition: "padding-bottom 250ms cubic-bezier(0.4,0,0.2,1)" }}>
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? KEYBOARD_HEIGHT : 0, transition: "padding-bottom var(--dur-base) var(--ease)" }}>
         <MatchHeader other={otherPerson} onBack={duet.reset} />
 
         <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? 16 : 24 }}>
@@ -284,7 +255,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
           <ChatStart self={selfPerson} other={otherPerson} />
 
           {nudgeVisible && (
-            <div className="anim-chat-in" style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <div className="anim-nudge-up" style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
               <ChatTimestamp />
               <div
                 role="button"
@@ -310,7 +281,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
           )}
 
           {phase === "sealed" && (
-            <div style={{ padding: "24px 24px 8px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <div style={{ padding: "24px 24px 8px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
               <ChatTimestamp />
               <SealedWaiting other={otherPerson} />
             </div>
@@ -319,7 +290,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
           {(phase === "sealed" || phase === "chat") && (
             <div style={{ paddingTop: phase === "chat" ? 10 : 4, paddingBottom: 0 }}>
               {phase === "chat" && bothPlayed && (
-                <div style={{ display: "flex", justifyContent: "center", padding: "0 24px 8px" }}>
+                <div style={{ display: "flex", justifyContent: "center", padding: "0 24px 4px" }}>
                   <ChatTimestamp />
                 </div>
               )}
@@ -345,12 +316,12 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
                   // A true 3D flip. Canonical setup: an invisible content spacer sets the
                   // card height, both faces are absolute with hidden backfaces, perspective
                   // lives on the parent. Tapping rotates the card to present the details.
-                  <div style={{ padding: "8px 24px 16px", perspective: 1400 }}>
+                  <div className="anim-nudge-up" style={{ padding: "8px 24px 16px", perspective: 1400 }}>
                     <div
                       style={{
                         position: "relative",
                         transformStyle: "preserve-3d",
-                        transition: "transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)",
+                        transition: "transform var(--dur-hero) var(--ease)",
                         transform: revealed ? "rotateY(180deg)" : "none",
                       }}
                     >
@@ -369,6 +340,11 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
                     </div>
                   </div>
                 )
+              )}
+              {duet.messages.some((m) => m.from !== "system") && (
+                <div style={{ display: "flex", justifyContent: "center", padding: "12px 16px 8px" }}>
+                  <ChatTimestamp time="1:50 PM" />
+                </div>
               )}
               {duet.messages.map((m) =>
                 m.from === "system" ? (
@@ -425,10 +401,10 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={handleSend}
                   aria-label="Send"
-                  style={{ width: 44, height: 44, flexShrink: 0, borderRadius: "50%", border: "none", background: MAIN_PRIMARY, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 18px -8px rgba(101,32,88,0.7)" }}
+                  style={{ width: 44, height: 44, flexShrink: 0, borderRadius: "50%", border: "none", background: MAIN_PRIMARY, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M9 14V5M5 9l4-4 4 4" stroke={ALPHA_WHITE_FF} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6l6 6-6 6" stroke={ALPHA_WHITE_FF} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
               ) : (
@@ -488,6 +464,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
                 total={vis.length}
                 currentAnswer={self.answers[currentPrompt.id]}
                 onAnswer={(pid, a) => duet.answer(selfId, pid, a)}
+                onWriteOwn={() => duet.flagWriteOwn(selfId)}
               />
             )}
           </div>

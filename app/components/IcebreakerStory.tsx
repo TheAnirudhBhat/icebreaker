@@ -37,10 +37,11 @@ function Pagination({ total, current }: { total: number; current: number }) {
               justifyContent: "center",
               overflow: "hidden",
               flexShrink: 0,
-              transition: "width 0.42s cubic-bezier(0.22,1,0.36,1), height 0.42s cubic-bezier(0.22,1,0.36,1), background-color 0.3s ease, box-shadow 0.3s ease",
+              // Brand --ease is too dramatic for this small size morph; a smooth ease-out reads better.
+              transition: "width var(--dur-entrance) cubic-bezier(0.22, 1, 0.36, 1), height var(--dur-entrance) cubic-bezier(0.22, 1, 0.36, 1), background-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease)",
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: isCur ? 1 : 0, transition: "opacity 0.25s ease" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: isCur ? 1 : 0, transition: "opacity var(--dur-micro) var(--ease)" }}>
               <circle cx="12" cy="8.5" r="3.4" stroke={TEXT_PRIMARY} strokeWidth="1.7" />
               <path d="M5.8 19a6.2 6.2 0 0 1 12.4 0" stroke={TEXT_PRIMARY} strokeWidth="1.7" strokeLinecap="round" />
             </svg>
@@ -72,12 +73,14 @@ export default function IcebreakerStory({
   total,
   currentAnswer,
   onAnswer,
+  onWriteOwn,
 }: {
   prompt: Prompt;
   currentIndex: number;
   total: number;
   currentAnswer?: Answer;
   onAnswer: (promptId: string, answer: Answer) => void;
+  onWriteOwn: () => void;
 }) {
   const max = maxSelectFor(prompt.id);
   const multi = max > 1;
@@ -149,7 +152,9 @@ export default function IcebreakerStory({
             {prompt.allowCustom && (
               <div>
                 <div style={{ height: 1, background: SUBTLE_INK }} />
-                <button type="button" onClick={() => setCustomOpen(true)} className="transition-transform active:scale-[0.99]" style={rowStyle}>
+                {/* Proto: free-text answers aren't wired up, so this surfaces an
+                    out-of-frame note (onWriteOwn) instead of opening the entry sheet. */}
+                <button type="button" onClick={onWriteOwn} className="transition-transform active:scale-[0.99]" style={rowStyle}>
                   <span style={labelStyle}>Write my own</span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
                     <path d="M4 20h4l10-10-4-4L4 16v4z" stroke={TEXT_PRIMARY} strokeWidth="1.6" strokeLinejoin="round" />
@@ -170,7 +175,7 @@ export default function IcebreakerStory({
           disabled={selected.length === 0}
           aria-label="Next question"
           className="transition-transform active:scale-[0.95]"
-          style={{ width: 48, height: 48, flexShrink: 0, borderRadius: 24, border: "none", background: MAIN_PRIMARY, opacity: selected.length ? 1 : 0.35, cursor: selected.length ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "opacity 0.2s ease" }}
+          style={{ width: 48, height: 48, flexShrink: 0, borderRadius: 24, border: "none", background: MAIN_PRIMARY, opacity: selected.length ? 1 : 0.35, cursor: selected.length ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "opacity var(--dur-micro) var(--ease)" }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M10 6l6 6-6 6" stroke={ALPHA_WHITE_FF} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />

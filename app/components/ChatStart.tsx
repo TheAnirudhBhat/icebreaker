@@ -3,7 +3,6 @@
 import type { CSSProperties } from "react";
 import { FONT_SANS } from "../lib/typography";
 import { TEXT_PRIMARY, MAIN_PRIMARY, ALPHA_WHITE_FF } from "../lib/colors";
-import { RADIUS_M } from "../lib/radii";
 import { ELEVATION_CARD } from "../lib/elevation";
 import Avatar from "./Avatar";
 import type { Person } from "../data/match";
@@ -36,7 +35,7 @@ export default function ChatStart({ self, other }: { self: Person; other: Person
       <div style={{ display: "flex", alignItems: "flex-end", gap: 8, justifyContent: isLiker ? "flex-end" : "flex-start", marginBottom: 8 }}>
         {!isLiker && <Avatar name={other.name} gradient={other.gradient} photo={other.photo} size={28} />}
         <div style={{ position: "relative", width: PHOTO_W, marginBottom: 14 }}>
-          <div style={{ width: PHOTO_W, aspectRatio: "220 / 250", borderRadius: RADIUS_M, backgroundImage: "url(/liked-photo.png)", backgroundSize: "cover", backgroundPosition: "center", boxShadow: ELEVATION_CARD }} />
+          <div style={{ width: PHOTO_W, aspectRatio: "220 / 250", borderRadius: 10, backgroundImage: "url(/liked-photo.png)", backgroundSize: "cover", backgroundPosition: "center", boxShadow: ELEVATION_CARD }} />
           <div style={{ position: "absolute", bottom: -14, ...(isLiker ? { right: 0 } : { left: 0 }), background: isLiker ? MAIN_PRIMARY : "#EEEEEE", borderRadius: 8, borderBottomRightRadius: isLiker ? 0 : 8, borderBottomLeftRadius: isLiker ? 8 : 0, padding: "8px 14px" }}>
             <span style={{ fontFamily: FONT_SANS, fontStyle: "italic", fontWeight: 400, fontSize: 15, lineHeight: "20px", color: isLiker ? ALPHA_WHITE_FF : TEXT_PRIMARY, whiteSpace: "nowrap" }}>
               {isLiker ? `You liked ${other.name}'s photo` : `${other.name} liked your photo`}

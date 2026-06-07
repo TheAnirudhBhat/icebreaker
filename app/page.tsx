@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import DeviceFrame from "./components/DeviceFrame";
 import PlayerPhone from "./components/PlayerPhone";
 import ProtoControls from "./components/ProtoControls";
@@ -11,18 +12,47 @@ import { ME, AANYA } from "./data/match";
 // Margin annotation shown OUTSIDE the phone shell while the first device is on the
 // connect screen, explaining the webview auth we skipped. Handwriting, text only.
 const CONNECT_NOTE =
-  "Tapping Connect opens a webview to sign in and authorize each app to share its info with Hinge. Skipped here for the proto.\n\nConnecting is a one-time step.";
+  "Tapping Connect opens a webview to sign in and authorize each app to share its info with Hinge. Skipped here for the proto.\n\nYou only see this screen the first time.";
 
 // Trigger-timing annotation for the in-chat nudge (timings are a starting guess).
 const NUDGE_NOTE =
-  "This nudge fires after a couple minutes on the chat, or when someone opens it, doesn't reply, then comes back hours later. Timing is a guess we can tune.";
+  "Triggered when someone sits on an empty chat without messaging, or returns to one they left unanswered. Timing still to be worked out.";
+
+// Shown when someone taps "Write my own" on a question: free-text entry isn't built
+// in this proto, so the row surfaces this note instead of opening a keyboard.
+const WRITE_OWN_NOTE = "Writing your own answer isn't wired up in this proto.";
 
 type Note = { text: string; top: number };
 
 function PhoneColumn({ label, side, note, children }: { label: string; side: "left" | "right"; note?: Note; children: React.ReactNode }) {
-  const noteStyle: React.CSSProperties | undefined = note && {
+  // Keep the last note mounted while it eases out, so margin notes fade in and out
+  // instead of popping. `shown` holds the content (incl. through the exit fade);
+  // `visible` drives opacity, flipped a frame after mount so the enter transitions too.
+  const [shown, setShown] = useState<Note | undefined>(note);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    if (!note) {
+      setVisible(false);
+      return;
+    }
+    setShown(note);
+    // Double rAF so the element paints at opacity 0 before flipping to 1. A single
+    // frame can batch both commits and skip the enter transition (it popped instead
+    // of faded, notably on the right column); two frames guarantee the fade.
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setVisible(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [note?.text, note?.top]);
+
+  const noteStyle: React.CSSProperties | undefined = shown && {
     position: "absolute",
-    top: note.top,
+    top: shown.top,
     width: 220,
     fontFamily: "'Caveat', cursive",
     fontWeight: 500,
@@ -30,6 +60,8 @@ function PhoneColumn({ label, side, note, children }: { label: string; side: "le
     lineHeight: "27px",
     color: "#9A9A9A",
     pointerEvents: "none",
+    opacity: visible ? 1 : 0,
+    transition: "opacity var(--dur-base) var(--ease)",
     ...(side === "left"
       ? ({ right: "100%", marginRight: 28, textAlign: "right" } as const)
       : ({ left: "100%", marginLeft: 28, textAlign: "left" } as const)),
@@ -38,9 +70,9 @@ function PhoneColumn({ label, side, note, children }: { label: string; side: "le
     <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 40 }}>
       {children}
       <span style={{ ...typography.metadata, color: TEXT_SECONDARY, textTransform: "uppercase", letterSpacing: "0.14em" }}>{label}&apos;s screen</span>
-      {note && noteStyle && (
+      {shown && noteStyle && (
         <div style={noteStyle}>
-          {note.text.split("\n\n").map((para, i) => (
+          {shown.text.split("\n\n").map((para, i) => (
             <p key={i} style={{ margin: 0, marginTop: i === 0 ? 0 : 14 }}>
               {para}
             </p>
@@ -57,13 +89,16 @@ export default function Page() {
   const iceMessages = duet.messages.filter((m) => m.from !== "system").length;
   const bothPlayed = duet.me.submitted && duet.aanya.submitted;
   const connectNote = (pid: "me" | "aanya"): Note | undefined =>
-    duet.firstConnector === pid && duet[pid].phase === "connect" && duet.generatingId !== pid
+    duet.firstConnector === pid && duet[pid].phase === "connect" && !duet.generating[pid]
       ? { text: CONNECT_NOTE, top: 320 }
       : undefined;
+  // Sits by the questions screen only while that phone is mid-game and just tapped it.
+  const writeOwnNote = (pid: "me" | "aanya"): Note | undefined =>
+    duet.writeOwnId === pid && duet[pid].phase === "playing" ? { text: WRITE_OWN_NOTE, top: 460 } : undefined;
   // The trigger-timing note rides alongside the left phone's first in-chat nudge.
   const meNote: Note | undefined =
-    connectNote("me") ?? (duet.me.phase === "trigger" && !bothPlayed && iceMessages < 5 ? { text: NUDGE_NOTE, top: 480 } : undefined);
-  const aanyaNote = connectNote("aanya");
+    connectNote("me") ?? writeOwnNote("me") ?? (duet.me.phase === "trigger" && !bothPlayed && iceMessages < 5 ? { text: NUDGE_NOTE, top: 480 } : undefined);
+  const aanyaNote = connectNote("aanya") ?? writeOwnNote("aanya");
 
   return (
     <>

@@ -1,138 +1,124 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import type { Duet } from "../hooks/useDuet";
-import { typography } from "../lib/typography";
-import {
-  TEXT_PRIMARY,
-  TEXT_SECONDARY,
-  TEXT_TERTIARY,
-  BG_CARD,
-  OUTLINE_BOLD,
-  OUTLINE_SUBTLE,
-  MAIN_PRIMARY,
-  MAIN_PRIMARY_SUBTLE,
-  ALPHA_WHITE_FF,
-} from "../lib/colors";
-import { RADIUS_L, RADIUS_PILL } from "../lib/radii";
+import { typography, FONT_SANS } from "../lib/typography";
+import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, BG_CARD, OUTLINE_SUBTLE } from "../lib/colors";
 
-function Pill({ onClick, children, filled }: { onClick: () => void; children: React.ReactNode; filled?: boolean }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="transition-transform active:scale-[0.97]"
-      style={{
-        ...typography.buttonSmall,
-        color: filled ? ALPHA_WHITE_FF : TEXT_PRIMARY,
-        background: filled ? MAIN_PRIMARY : "transparent",
-        border: `1px solid ${filled ? MAIN_PRIMARY : OUTLINE_BOLD}`,
-        borderRadius: RADIUS_PILL,
-        padding: "8px 14px",
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function PhaseChip({ label, phase }: { label: string; phase: string }) {
-  return (
-    <span style={{ ...typography.metadata, color: TEXT_TERTIARY, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-      {label}{" "}
-      <span style={{ color: TEXT_SECONDARY, background: MAIN_PRIMARY_SUBTLE, padding: "2px 7px", borderRadius: RADIUS_PILL }}>{phase}</span>
-    </span>
-  );
-}
-
-const JUMPS: { id: "trigger" | "connect" | "questions" | "sealed" | "reveal"; label: string }[] = [
-  { id: "trigger", label: "Trigger" },
-  { id: "connect", label: "Connect" },
-  { id: "questions", label: "Questions" },
-  { id: "sealed", label: "Sealed" },
-  { id: "reveal", label: "Reveal" },
+const JUMPS: { id: "trigger" | "connect" | "questions" | "sealed" | "ready" | "reveal"; label: string; desc: string }[] = [
+  { id: "trigger", label: "Trigger", desc: "The in-chat nudge to start" },
+  { id: "connect", label: "Connect", desc: "Link your apps" },
+  { id: "questions", label: "Questions", desc: "Answer the prompts" },
+  { id: "sealed", label: "Sealed", desc: "Answered, waiting on them" },
+  { id: "ready", label: "Tap to reveal", desc: "Both answered, card not opened" },
+  { id: "reveal", label: "Reveal", desc: "Icebreakers revealed" },
 ];
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-      <span style={{ ...typography.metadata, color: TEXT_TERTIARY, textTransform: "uppercase", letterSpacing: "0.1em", width: 56 }}>{label}</span>
-      {children}
-    </div>
-  );
-}
-
+// Out-of-frame debug drawer: a subtle grey grip pulls out a Hinge-style list to
+// jump either phone straight to a state. On first load the grip gives a one-time
+// nudge (a small "Jump to a state" tag + a gentle tug) so it's discoverable, then
+// quietly settles into the subtle grip once noticed or opened.
 export default function ProtoControls({ duet }: { duet: Duet }) {
   const [open, setOpen] = useState(false);
+  const [hint, setHint] = useState(true);
+
+  // The discovery hint fades on its own after a few seconds.
+  useEffect(() => {
+    if (!hint) return;
+    const t = window.setTimeout(() => setHint(false), 5000);
+    return () => window.clearTimeout(t);
+  }, [hint]);
+
+  const showHint = hint && !open;
 
   return (
     <div style={{ position: "fixed", top: "50%", right: 0, transform: "translateY(-50%)", zIndex: 60, display: "flex", alignItems: "center" }}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-label={open ? "Hide director" : "Show director"}
+      {/* one-time discovery tag, sits just left of the grip and fades away */}
+      <div
+        aria-hidden
         style={{
-          flexShrink: 0,
-          width: 26,
-          height: 70,
-          borderRadius: "10px 0 0 10px",
-          border: `1px solid ${OUTLINE_SUBTLE}`,
-          borderRight: "none",
-          background: BG_CARD,
-          cursor: "pointer",
+          position: "absolute",
+          right: 30,
+          top: "50%",
+          transform: `translateY(-50%) translateX(${showHint ? 0 : 10}px)`,
+          opacity: showHint ? 1 : 0,
+          transition: "opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease)",
+          pointerEvents: "none",
+          whiteSpace: "nowrap",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "-8px 0 22px -16px rgba(26,22,20,0.3)",
+          gap: 6,
+          background: BG_CARD,
+          border: `1px solid ${OUTLINE_SUBTLE}`,
+          borderRadius: 999,
+          boxShadow: "0 8px 22px -10px rgba(26,22,20,0.3)",
+          padding: "7px 13px",
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transform: open ? "none" : "rotate(180deg)" }}>
-          <path d="M9 3l-4 4 4 4" stroke={TEXT_SECONDARY} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        <span style={{ fontFamily: FONT_SANS, fontWeight: 500, fontSize: 12, lineHeight: "16px", color: TEXT_SECONDARY }}>Jump to a state</span>
+        <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
+          <path d="M6 4l5 5-5 5" stroke={TEXT_TERTIARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => {
+          setHint(false);
+          setOpen((o) => !o);
+        }}
+        aria-label={open ? "Hide jump panel" : "Show jump panel"}
+        style={{ flexShrink: 0, width: 22, height: 64, border: "none", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        <span
+          className={showHint ? "anim-grip-tug" : undefined}
+          style={{
+            width: 4,
+            height: showHint ? 44 : 36,
+            borderRadius: 2,
+            background: showHint ? "#ABA9A7" : "#C9C7C5",
+            transition: "height var(--dur-base) var(--ease), background var(--dur-base) var(--ease)",
+          }}
+        />
       </button>
 
-      <div style={{ width: open ? 340 : 0, overflow: "hidden", transition: "width 0.32s cubic-bezier(0.22,1,0.36,1)" }}>
+      <div style={{ width: open ? 296 : 0, overflow: "hidden", transition: "width var(--dur-base) var(--ease)" }}>
         <div
           style={{
-            width: 340,
+            width: 296,
             maxHeight: "88vh",
             overflowY: "auto",
             background: BG_CARD,
             borderLeft: `1px solid ${OUTLINE_SUBTLE}`,
             borderTop: `1px solid ${OUTLINE_SUBTLE}`,
             borderBottom: `1px solid ${OUTLINE_SUBTLE}`,
-            borderRadius: "12px 0 0 12px",
-            padding: 16,
+            borderRadius: "14px 0 0 14px",
+            padding: "18px 20px",
             boxShadow: "-16px 0 40px -20px rgba(26,22,20,0.3)",
           }}
         >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-        <span style={{ ...typography.metadata, color: TEXT_TERTIARY, textTransform: "uppercase", letterSpacing: "0.1em" }}>Director</span>
-        <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-          <PhaseChip label="you" phase={duet.me.phase} />
-          <PhaseChip label="aanya" phase={duet.aanya.phase} />
-        </div>
-      </div>
-
-      <Row label="Run">
-        <Pill onClick={duet.reset}>↺ Replay</Pill>
-        <Pill onClick={duet.aanyaAutoPlay} filled>Aanya plays</Pill>
-        <Pill onClick={duet.aanyaPass}>Aanya passes</Pill>
-      </Row>
-
-      <Row label="Jump">
-        {JUMPS.map((j) => (
-          <Pill key={j.id} onClick={() => duet.debugJump(j.id)}>
-            {j.label}
-          </Pill>
-        ))}
-      </Row>
-
-          <p style={{ ...typography.caption, color: TEXT_TERTIARY, margin: "14px 2px 0", lineHeight: 1.5 }}>
-            Play either phone, or run Aanya from here. Jump straight to any state.
-          </p>
+          <span style={{ ...typography.metadata, color: TEXT_TERTIARY, textTransform: "uppercase", letterSpacing: "0.1em" }}>Jump to a state</span>
+          <div style={{ display: "flex", flexDirection: "column", marginTop: 6 }}>
+            {JUMPS.map((j, i) => (
+              <Fragment key={j.id}>
+                {i > 0 && <div style={{ height: 1, background: OUTLINE_SUBTLE }} />}
+                <button
+                  type="button"
+                  onClick={() => duet.debugJump(j.id)}
+                  className="transition-transform active:scale-[0.99]"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, width: "100%", background: "transparent", border: "none", padding: "12px 0", cursor: "pointer", textAlign: "left" }}
+                >
+                  <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
+                    <span style={{ fontFamily: FONT_SANS, fontWeight: 500, fontSize: 14, lineHeight: "20px", color: TEXT_PRIMARY }}>{j.label}</span>
+                    <span style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 12, lineHeight: "16px", color: TEXT_SECONDARY }}>{j.desc}</span>
+                  </span>
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M6 4l5 5-5 5" stroke={TEXT_TERTIARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </Fragment>
+            ))}
+          </div>
         </div>
       </div>
     </div>

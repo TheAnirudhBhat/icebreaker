@@ -26,7 +26,7 @@ export default function RevealSlot({ revealed, children }: { revealed: boolean; 
         height: height !== undefined ? height : "auto",
         overflow,
         perspective: 1000,
-        transition: "height 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: "height var(--dur-entrance) var(--ease)",
       }}
     >
       <div ref={innerRef}>{children}</div>

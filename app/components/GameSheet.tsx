@@ -38,6 +38,13 @@ export default function GameSheet({
   const lastChildren = useRef<ReactNode>(children);
   if (open) lastChildren.current = children;
 
+  // Freeze fullHeight through the exit too. It's derived from the phase, which flips
+  // the instant we start dismissing, so without this the closing sheet would suddenly
+  // round its top corners and flash the dark backdrop back in mid-slide.
+  const lastFullHeight = useRef(fullHeight);
+  if (open) lastFullHeight.current = fullHeight;
+  const fh = open ? fullHeight : lastFullHeight.current;
+
   const fallback = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clearFallback = () => {
     if (fallback.current) {
@@ -109,7 +116,10 @@ export default function GameSheet({
         className={exiting ? "anim-backdrop-out" : "anim-backdrop-in"}
         onClick={onClose}
         aria-hidden
-        style={{ position: "absolute", inset: 0, background: BG_OVERLAY }}
+        // Full-screen steps (intro/connect/playing) cover the whole phone, so the dark
+        // scrim only ever flashed during the slide. Drop it there; keep it for the
+        // content-height detail sheet that genuinely sits over the chat.
+        style={{ position: "absolute", inset: 0, background: fh ? "transparent" : BG_OVERLAY }}
       />
       <div
         onAnimationEnd={(e) => {
@@ -122,8 +132,8 @@ export default function GameSheet({
           right: isSheet ? 0 : 12,
           bottom: isSheet ? 0 : 12,
           background: BG_PRIMARY,
-          borderRadius: isSheet ? (fullHeight || expanded ? 0 : "16px 16px 0 0") : 24,
-          transition: "border-radius 0.36s cubic-bezier(0.22, 1, 0.36, 1)",
+          borderRadius: isSheet ? (fh || expanded ? 0 : "16px 16px 0 0") : 24,
+          transition: "border-radius var(--dur-base) var(--ease)",
           boxShadow: isSheet
             ? "0 -12px 44px -20px rgba(26,22,20,0.28)"
             : "0 18px 50px -12px rgba(26,22,20,0.45)",
@@ -140,9 +150,9 @@ export default function GameSheet({
             // A scrollable sheet turns into a full page the moment you scroll it.
             if (isSheet && !fullHeight && !expanded && e.currentTarget.scrollTop > 4) setExpanded(true);
           }}
-          style={{ height, overflowY: scrollable ? "auto" : "hidden", overflowX: "hidden", transition: "height 0.36s cubic-bezier(0.22, 1, 0.36, 1)" }}
+          style={{ height, overflowY: scrollable ? "auto" : "hidden", overflowX: "hidden", transition: "height var(--dur-base) var(--ease)" }}
         >
-          <div ref={innerRef} style={fullHeight ? { height: "100%" } : { paddingBottom: isSheet ? 14 : 0 }}>{content}</div>
+          <div ref={innerRef} style={fh ? { height: "100%" } : { paddingBottom: isSheet ? 14 : 0 }}>{content}</div>
         </div>
       </div>
     </div>

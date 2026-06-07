@@ -214,6 +214,29 @@ export function topicFor(id: string): string {
   return TOPICS[id] ?? "Answer";
 }
 
+// A neutral subject phrase per prompt, used when two answers differ so the reveal
+// row carries the question's context and still makes sense read days later,
+// e.g. "On tonight's gig, you went with a late DJ set, Aanya with a full arena show."
+export const SUBJECTS: Record<string, string> = {
+  "hot-take": "your hot take",
+  ick: "your ick",
+  overrated: "what's overrated",
+  "talk-hour": "what you'd talk about for hours",
+  nerd: "your secret nerd-out",
+  hill: "the hill you'd die on",
+  "fall-for": "the type you fall for",
+  "green-flag": "green flags",
+  "know-me": "the fastest way to know you",
+  "song-self": "your personality song",
+  gig: "tonight's gig",
+  repeat: "what's on repeat",
+  saturday: "the ideal Saturday",
+};
+
+export function subjectFor(id: string): string {
+  return SUBJECTS[id] ?? "that one";
+}
+
 // Surface the profile-centered prompts (music + scene) first, so a deck actually
 // feels drawn from what the two share rather than generic gap-fillers.
 const PRIORITY = ["gig", "repeat", "saturday"];
