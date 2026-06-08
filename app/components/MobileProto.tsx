@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import PlayerPhone from "./PlayerPhone";
+import { SCREEN_WIDTH } from "./DeviceFrame";
 import type { Duet } from "../hooks/useDuet";
 
-// On-phone view of the proto: one phone (Arjun's), rendered responsively at the device's
-// real width with NO transform scaling. That keeps text at its native size (14px renders at
-// 14px, exactly like the desktop shell) AND lets the app fill the screen edge to edge. A
-// fixed-width mock can't be both edge to edge and native when you SCALE it (scale up = big
-// text, scale 1 = side margins); rendering at the real width sidesteps that by letting the
-// already flex/percentage-based layout reflow to fill, instead of scaling. The stage is
-// pinned to the visual viewport (height + offset) so the keyboard shrinks it cleanly.
+// On-phone view of the proto: one phone (Arjun's). The 360-wide design (the same canvas as
+// the desktop shell) is scaled with `transform: scale` to FILL the device width, so it looks
+// pixel-identical to the desktop phone, just sized to the screen. On a phone wider than 360
+// that means scaling slightly above 1:1 (text included) so the whole thing fills edge to edge
+// with no margins. The stage is pinned to the visual viewport (height + offset) so the
+// keyboard shrinks it cleanly instead of covering it.
 export default function MobileProto({ duet }: { duet: Duet }) {
+  const areaRef = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState<{ scale: number; h: number } | null>(null);
   const [vp, setVp] = useState<{ height: number; offsetTop: number } | null>(null);
 
   // There's no second phone on the device view, so once you seal your answers,
@@ -23,6 +25,23 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     const t = window.setTimeout(() => duet.aanyaAutoPlay(), 2600);
     return () => window.clearTimeout(t);
   }, [sealed, duet.aanyaAutoPlay]);
+
+  // Scale the 360 design to fill the width (clientWidth / 360), so it fills edge to edge and
+  // keeps the desktop shell's exact proportions (everything scales together, text included).
+  // Height is sized so the scaled phone fills vertically too. Refit whenever the area changes
+  // (rotation, or the keyboard shrinking the viewport).
+  useLayoutEffect(() => {
+    const el = areaRef.current;
+    if (!el) return;
+    const measure = () => {
+      const scale = el.clientWidth / SCREEN_WIDTH;
+      setFit({ scale, h: el.clientHeight / scale });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // Track the visual viewport (height + vertical offset) so the keyboard shrinks and
   // repositions the stage instead of covering it or shoving the page around.
@@ -50,14 +69,28 @@ export default function MobileProto({ duet }: { duet: Duet }) {
         top: vp ? vp.offsetTop : 0,
         height: vp ? vp.height : "100dvh",
         background: "#FFFFFF",
-        // Clear the notch and home indicator only; left/right insets are 0 in portrait,
-        // so the app still runs edge to edge horizontally.
+        // Clear the notch and home indicator only; left/right insets are 0 in portrait, so
+        // the scaled phone fills the width edge to edge.
         padding: "env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
-        <PlayerPhone duet={duet} selfId="me" onDevice />
+      <div ref={areaRef} style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
+        {fit && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: SCREEN_WIDTH,
+              height: fit.h,
+              transform: `scale(${fit.scale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            <PlayerPhone duet={duet} selfId="me" onDevice />
+          </div>
+        )}
       </div>
     </div>
   );
