@@ -5,13 +5,12 @@ import PlayerPhone from "./PlayerPhone";
 import { SCREEN_WIDTH } from "./DeviceFrame";
 import type { Duet } from "../hooks/useDuet";
 
-// On-phone view of the proto: one phone (Arjun's), near edge to edge. The 360-wide app
-// is scaled with `transform: scale` (not the CSS `zoom` property, which renders
-// inconsistently on mobile Safari). We fill the full width (edge to edge) by scaling the
-// 360-wide design to the screen, so there are no side margins; text scales with the
-// width (the tradeoff a fixed-width design makes for zero margins). The stage is pinned to
-// the visual viewport (height + offset), so when the keyboard opens the phone refits
-// into the space above it and follows iOS's scroll instead of glitching out.
+// On-phone view of the proto: one phone (Arjun's). The 360-wide app is scaled with
+// `transform: scale` (not the CSS `zoom` property, which renders inconsistently on mobile
+// Safari). We render at 0.9 so the fixed 360 design never reads oversized on a phone wider
+// than 360; it sits centered with thin side margins. The stage is pinned to the visual
+// viewport (height + offset), so when the keyboard opens the phone refits into the space
+// above it and follows iOS's scroll instead of glitching out.
 export default function MobileProto({ duet }: { duet: Duet }) {
   const areaRef = useRef<HTMLDivElement>(null);
   const [fit, setFit] = useState<{ scale: number; h: number; left: number } | null>(null);
@@ -27,18 +26,18 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     return () => window.clearTimeout(t);
   }, [sealed, duet.aanyaAutoPlay]);
 
-  // Fill the full width edge to edge (below 1:1 on phones narrower than 360), size the
-  // height so the scaled phone fills the area, and center it. Refit whenever the area
+  // Scale the 360 design to 0.9 (capped at the fill scale), size the height so the scaled
+  // phone fills the area vertically, and center it horizontally. Refit whenever the area
   // changes (rotation, or the keyboard shrinking the viewport).
   useLayoutEffect(() => {
     const el = areaRef.current;
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
-      // Fill the full width (edge to edge), so there are no side margins/boxes, even
-      // behind the dimmed sheet scrim. The 360-wide design scales to the viewport: above
-      // 1:1 on wide phones, below 1:1 (smaller text) on phones narrower than 360.
-      const scale = w / SCREEN_WIDTH;
+      // Render the 360-wide design at 0.9 (smaller than 1:1) so text never reads oversized
+      // on phones wider than 360; it's centered with thin side margins. Capped at the fill
+      // scale so a phone narrower than ~400px never overflows.
+      const scale = Math.min(0.9, w / SCREEN_WIDTH);
       setFit({ scale, h: el.clientHeight / scale, left: Math.max(0, (w - SCREEN_WIDTH * scale) / 2) });
     };
     measure();

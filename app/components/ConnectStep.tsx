@@ -160,10 +160,12 @@ export default function ConnectStep({
                       </span>
                     </span>
                     {on ? (
-                      <span className="anim-reveal-pop" style={{ width: 22, height: 22, borderRadius: "50%", background: MAIN_PRIMARY, display: "grid", placeItems: "center", flexShrink: 0 }}>
-                        {/* Path bbox centered in the viewBox (y was ~0.5 low); display:block drops the inline gap. */}
-                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ display: "block" }}>
-                          <path d="M2.5 7L6 10.5L11.5 3.5" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                      <span className="anim-reveal-pop" style={{ display: "flex", flexShrink: 0 }}>
+                        {/* Circle + check are ONE vector, so there's no parent/child offset to
+                            round under the device transform scale; the tick stays centered. */}
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style={{ display: "block" }}>
+                          <circle cx="11" cy="11" r="11" fill={MAIN_PRIMARY} />
+                          <path d="M6 11L9.5 14.5L16 7.5" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
                     ) : loading ? (

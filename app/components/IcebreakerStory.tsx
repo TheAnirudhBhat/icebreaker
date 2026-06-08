@@ -59,11 +59,12 @@ function Indicator({ multi, checked }: { multi: boolean; checked: boolean }) {
     return <span style={{ width: 18, height: 18, borderRadius: radius, background: "#F1F1F1", flexShrink: 0 }} />;
   }
   return (
-    <span style={{ width: 18, height: 18, borderRadius: radius, background: MAIN_PRIMARY, display: "grid", placeItems: "center", flexShrink: 0 }}>
-      {/* Path bbox centered in the viewBox (was 0.5 low); display:block drops the inline
-          baseline gap so the tick stays centered under the device transform scale. */}
-      <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ display: "block" }}>
-        <path d="M2.5 7L6 10.5L11.5 3.5" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <span style={{ display: "flex", flexShrink: 0 }}>
+      {/* Box/circle + check are ONE vector, so there's no parent/child offset to round
+          under the device transform scale; the tick stays centered at any size. */}
+      <svg width="18" height="18" viewBox="0 0 22 22" fill="none" style={{ display: "block" }}>
+        {multi ? <rect x="0" y="0" width="22" height="22" rx="6" fill={MAIN_PRIMARY} /> : <circle cx="11" cy="11" r="11" fill={MAIN_PRIMARY} />}
+        <path d="M6 11L9.5 14.5L16 7.5" stroke={ALPHA_WHITE_FF} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   );
