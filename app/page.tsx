@@ -6,6 +6,7 @@ import PlayerPhone from "./components/PlayerPhone";
 import ProtoControls from "./components/ProtoControls";
 import { useDuet } from "./hooks/useDuet";
 import { usePreloadAssets } from "./hooks/usePreloadAssets";
+import { useStageFit } from "./hooks/useStageFit";
 import { typography, FONT_SERIF, FONT_SANS } from "./lib/typography";
 import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, BG_SHEET, OUTLINE_SUBTLE, MAIN_PRIMARY } from "./lib/colors";
 import { ME, AANYA } from "./data/match";
@@ -213,6 +214,7 @@ export default function Page() {
   const duet = useDuet();
   const [notesOpen, setNotesOpen] = useState(false);
   usePreloadAssets();
+  const fit = useStageFit();
 
   const iceMessages = duet.messages.filter((m) => m.from !== "system").length;
   const bothPlayed = duet.me.submitted && duet.aanya.submitted;
@@ -287,7 +289,10 @@ export default function Page() {
         </svg>
       </button>
 
-      <div style={{ display: "flex", gap: 160, alignItems: "flex-start", justifyContent: "center", flexWrap: "wrap" }}>
+      {/* The two-phone stage: native 1:1, shrinking only to fit shorter screens.
+          `zoom` scales the layout box too, so it stays centered with no wrapper.
+          Hidden until the first measurement so it never flashes a wrong size. */}
+      <div style={{ display: "flex", gap: fit.gap, alignItems: "flex-start", zoom: fit.scale, opacity: fit.ready ? 1 : 0 }}>
         <PhoneColumn label={ME.name} side="left" note={meNote}>
           <DeviceFrame>
             <PlayerPhone duet={duet} selfId="me" />

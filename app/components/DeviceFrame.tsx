@@ -12,8 +12,8 @@ import { BG_PRIMARY } from "../lib/colors";
 // shrink the device by editing these dimensions, never by scaling, so type stays
 // consistent. Every value is the old 402-wide frame times 360/402, so the bezel art
 // still lines up exactly with the screen cut-out.
-const OUTER_W = 403;
-const OUTER_H = 824;
+export const OUTER_W = 403;
+export const OUTER_H = 824;
 const SCREEN_W = 360;
 const SCREEN_H = 783;
 const INSET_TOP = 20.6;
@@ -21,6 +21,7 @@ const INSET_LEFT = 21.5;
 const SCREEN_RADIUS = 45;
 
 export const SCREEN_WIDTH = SCREEN_W;
+export const BEZEL_SRC = "/iphone17_bezel.png";
 
 export default function DeviceFrame({ children }: { children: ReactNode }) {
   return (
@@ -42,7 +43,7 @@ export default function DeviceFrame({ children }: { children: ReactNode }) {
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/iphone17_bezel.png"
+        src={BEZEL_SRC}
         alt=""
         aria-hidden="true"
         style={{

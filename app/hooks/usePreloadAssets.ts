@@ -1,26 +1,28 @@
 "use client";
 
 import { useEffect } from "react";
+import { BEZEL_SRC } from "../components/DeviceFrame";
+import { ME, AANYA } from "../data/match";
+import { SERVICES } from "../data/connects";
 
-// Single source of truth for the images the proto renders across every state.
-// Most are gated behind a phase (connect logos, explainer art, sealed icon,
-// reveal cover), so without warming they only fetch the first time you reach
-// that state, which reads as a pop. Keep this in sync with the assets under
-// public/ that components actually render.
+// Images the proto renders across its states. Most are gated behind a phase
+// (connect logos, explainer art, sealed icon, reveal cover), so without warming
+// they only fetch the first time you reach that state, which reads as a pop. The
+// photos, service logos and bezel are pulled from their source modules so they
+// can't drift; the rest are one-off component art (inline literals in their own
+// components). Keep the literal list in sync with that art under public/.
 const IMAGE_ASSETS = [
-  "/iphone17_bezel.png",
+  BEZEL_SRC,
+  ME.photo,
+  AANYA.photo,
+  ...SERVICES.map((s) => s.logo),
   "/hinge-icon.png",
   "/nudge-icon.png",
   "/liked-photo.png",
-  "/arjun.jpg",
-  "/aanya.jpg",
   "/icebreaker-hero.png",
   "/prop-icons.png",
   "/sealed-icon.png",
   "/reveal-cover.png",
-  "/logos/spotify.svg",
-  "/logos/apple-music.svg",
-  "/logos/instagram.svg",
 ];
 
 // Decoded images held for the page's lifetime so they stay warm in memory, not
@@ -34,6 +36,7 @@ export function usePreloadAssets() {
   useEffect(() => {
     if (warmed.length) return;
     for (const src of IMAGE_ASSETS) {
+      if (!src) continue;
       const img = new Image();
       img.decoding = "async";
       img.src = src;
