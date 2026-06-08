@@ -90,7 +90,7 @@ export default function ConnectStep({
       setLottieReady(false);
       return;
     }
-    const t = window.setTimeout(() => setLottieReady(true), 600);
+    const t = window.setTimeout(() => setLottieReady(true), 300);
     return () => window.clearTimeout(t);
   }, [generating]);
 

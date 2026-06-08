@@ -15,6 +15,10 @@ export const viewport: Viewport = {
   // Resize the layout (not just the visual viewport) when the keyboard opens, so the
   // on-device proto can refit above it instead of being covered.
   interactiveWidget: "resizes-content",
+  // Lock zoom so iOS never auto-zooms when the message box is focused (it then only
+  // shrinks the vertical area, which is the normal chat behaviour we want).
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
