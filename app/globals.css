@@ -210,6 +210,21 @@ body {
 @keyframes gripTug { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3px); } }
 .anim-grip-tug { animation: gripTug 1.8s var(--ease) infinite; }
 
+/* Design Notes modal: choreographed so the heavy blur and the card never animate at
+   once (that was the lag). Enter = blur fades in, then the card; exit = card leaves,
+   then the blur, so the card never shows against the un-blurred page. */
+@keyframes modalScrimIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalScrimOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes modalCardIn { from { opacity: 0; transform: translateY(16px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes modalCardOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(16px) scale(0.985); } }
+.anim-modal-scrim-in { animation: modalScrimIn 0.45s ease-out both; }
+.anim-modal-scrim-out { animation: modalScrimOut 0.4s ease-in 0.4s both; }
+.anim-modal-in { animation: modalCardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+.anim-modal-out { animation: modalCardOut 0.4s cubic-bezier(0.55, 0, 0.78, 0.2) both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-modal-scrim-in, .anim-modal-scrim-out, .anim-modal-in, .anim-modal-out { animation: none; }
+}
+
 .typing-dot {
   width: 6px;
   height: 6px;

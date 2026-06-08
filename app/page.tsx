@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DeviceFrame from "./components/DeviceFrame";
 import PlayerPhone from "./components/PlayerPhone";
 import ProtoControls from "./components/ProtoControls";
@@ -77,9 +77,9 @@ function PhoneColumn({ label, side, note, children }: { label: string; side: "le
       : ({ left: "100%", marginLeft: 28, textAlign: "left" } as const)),
   };
   return (
-    <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 40 }}>
+    <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
       {children}
-      <span style={{ ...typography.metadata, color: TEXT_SECONDARY, textTransform: "uppercase", letterSpacing: "0.14em" }}>{label}&apos;s screen</span>
+      <span style={{ fontFamily: "'Caveat', cursive", fontWeight: 500, fontSize: 20, lineHeight: "24px", color: "#9A9A9A" }}>{label}&apos;s screen</span>
       {shown && noteStyle && (
         <div style={noteStyle}>
           {shown.text.split("\n\n").map((para, i) => (
@@ -97,25 +97,34 @@ function PhoneColumn({ label, side, note, children }: { label: string; side: "le
 // and fading in/out. Opened from the top-right info button.
 function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mounted, setMounted] = useState(open);
-  const [visible, setVisible] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const fallback = useRef<number | null>(null);
   useEffect(() => {
     if (open) {
+      if (fallback.current) {
+        window.clearTimeout(fallback.current);
+        fallback.current = null;
+      }
       setMounted(true);
-      // Double rAF: paint at opacity 0 first so the enter transition actually runs,
-      // instead of the browser batching both commits into one frame (an instant pop).
-      let raf2 = 0;
-      const raf1 = requestAnimationFrame(() => {
-        raf2 = requestAnimationFrame(() => setVisible(true));
-      });
-      return () => {
-        cancelAnimationFrame(raf1);
-        cancelAnimationFrame(raf2);
-      };
+      setExiting(false);
+    } else if (mounted) {
+      // Play the exit animation, then unmount on animationend; the fallback timer
+      // covers reduced motion, where no animation fires.
+      setExiting(true);
+      if (fallback.current) window.clearTimeout(fallback.current);
+      fallback.current = window.setTimeout(() => {
+        setMounted(false);
+        setExiting(false);
+      }, 850);
     }
-    setVisible(false);
-    const t = window.setTimeout(() => setMounted(false), 340);
-    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+  useEffect(
+    () => () => {
+      if (fallback.current) window.clearTimeout(fallback.current);
+    },
+    []
+  );
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -128,13 +137,22 @@ function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) 
   return (
     <div
       onClick={onClose}
-      style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "rgba(26,22,20,0.22)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", opacity: visible ? 1 : 0, transition: "opacity var(--dur-base) var(--ease)" }}
+      onAnimationEnd={(e) => {
+        // The scrim's fade-out is the last step of the exit; unmount when it ends.
+        if (exiting && e.target === e.currentTarget) {
+          setMounted(false);
+          setExiting(false);
+        }
+      }}
+      className={exiting ? "anim-modal-scrim-out" : "anim-modal-scrim-in"}
+      style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "rgba(26,22,20,0.22)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Design notes"
         onClick={(e) => e.stopPropagation()}
+        className={exiting ? "anim-modal-out" : "anim-modal-in"}
         style={{
           position: "relative",
           width: "100%",
@@ -146,9 +164,6 @@ function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) 
           borderRadius: 24,
           boxShadow: "0 44px 110px -36px rgba(26,22,20,0.5)",
           padding: "52px 60px 60px",
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0) scale(1)" : "translateY(10px) scale(0.985)",
-          transition: "opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease)",
         }}
       >
         <button
@@ -237,7 +252,7 @@ export default function Page() {
           <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 28, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
             Icebreaker
           </div>
-          <span style={{ ...typography.caption, color: TEXT_TERTIARY, lineHeight: "16px" }}>a hinge feature concept</span>
+          <span style={{ ...typography.caption, fontFamily: FONT_SANS, fontWeight: 400, color: TEXT_TERTIARY, lineHeight: "16px" }}>a hinge feature concept</span>
         </div>
       </header>
 

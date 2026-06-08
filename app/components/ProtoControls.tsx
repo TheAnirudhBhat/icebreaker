@@ -45,11 +45,11 @@ export default function ProtoControls({ duet }: { duet: Duet }) {
           transition: "opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease)",
           pointerEvents: "none",
           whiteSpace: "nowrap",
-          fontFamily: FONT_SANS,
+          fontFamily: "'Caveat', cursive",
           fontWeight: 500,
-          fontSize: 13,
-          lineHeight: "16px",
-          color: TEXT_SECONDARY,
+          fontSize: 20,
+          lineHeight: "24px",
+          color: "#9A9A9A",
         }}
       >
         Jump to a state
