@@ -5,22 +5,21 @@ import PlayerPhone from "./PlayerPhone";
 import { SCREEN_WIDTH } from "./DeviceFrame";
 import type { Duet } from "../hooks/useDuet";
 
-// On-phone view of the proto: one phone (Arjun's), edge to edge. The 360-wide app is
-// scaled with `transform: scale` to fill the device width. We use transform, not the
-// CSS `zoom` property, because `zoom` renders inconsistently on mobile Safari (the
-// proto looked right in desktop device-emulation but broke on real phones). The scale
-// never drops below 1, so text always renders at least its design size and never goes
-// illegibly small. The container tracks the visual viewport, so when the device
-// keyboard opens the phone refits into the space above it and the compose bar stays
-// visible.
+// On-phone view of the proto: one phone (Arjun's), near edge to edge. The 360-wide app
+// is scaled with `transform: scale` (not the CSS `zoom` property, which renders
+// inconsistently on mobile Safari). We fill ~95% of the width and center it, so type
+// reads a touch smaller than a full-width upscale while still feeling full-bleed. Scale
+// never drops below 1, so text never goes below its design size. The stage is pinned to
+// the visual viewport (height + offset), so when the keyboard opens the phone refits
+// into the space above it and follows iOS's scroll instead of glitching out.
 export default function MobileProto({ duet }: { duet: Duet }) {
   const areaRef = useRef<HTMLDivElement>(null);
-  const [fit, setFit] = useState<{ scale: number; h: number } | null>(null); // null until measured, so it never flashes unscaled
-  const [vh, setVh] = useState<number | undefined>(undefined);
+  const [fit, setFit] = useState<{ scale: number; h: number; left: number } | null>(null);
+  const [vp, setVp] = useState<{ height: number; offsetTop: number } | null>(null);
 
   // There's no second phone on the device view, so once you seal your answers,
-  // simulate the match answering after a beat, so the waiting state advances to
-  // the reveal on its own.
+  // simulate the match answering after a beat so the waiting state advances to the
+  // reveal on its own.
   const sealed = duet.me.phase === "sealed";
   useEffect(() => {
     if (!sealed) return;
@@ -28,15 +27,16 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     return () => window.clearTimeout(t);
   }, [sealed, duet.aanyaAutoPlay]);
 
-  // Fill the width (never shrinking below 1:1), then size the logical height so the
-  // scaled phone fills the whole available area. Refit whenever the area changes
-  // (rotation, or the keyboard shrinking the viewport).
+  // Fill ~95% of the width (never below 1:1), size the height so the scaled phone fills
+  // the area, and center it horizontally. Refit whenever the area changes (rotation, or
+  // the keyboard shrinking the viewport).
   useLayoutEffect(() => {
     const el = areaRef.current;
     if (!el) return;
     const measure = () => {
-      const scale = Math.max(1, el.clientWidth / SCREEN_WIDTH);
-      setFit({ scale, h: el.clientHeight / scale });
+      const w = el.clientWidth;
+      const scale = Math.max(1, (w / SCREEN_WIDTH) * 0.95);
+      setFit({ scale, h: el.clientHeight / scale, left: Math.max(0, (w - SCREEN_WIDTH * scale) / 2) });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -44,16 +44,19 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     return () => ro.disconnect();
   }, []);
 
-  // Drive the height from the visual viewport so the keyboard shrinks the stage
-  // instead of covering it.
+  // Track the visual viewport (height + vertical offset) so the keyboard shrinks and
+  // repositions the stage instead of covering it or shoving the page around.
   useLayoutEffect(() => {
     const vv = window.visualViewport;
-    const update = () => setVh(vv ? vv.height : window.innerHeight);
+    const update = () =>
+      setVp(vv ? { height: vv.height, offsetTop: vv.offsetTop } : { height: window.innerHeight, offsetTop: 0 });
     update();
     vv?.addEventListener("resize", update);
+    vv?.addEventListener("scroll", update);
     window.addEventListener("resize", update);
     return () => {
       vv?.removeEventListener("resize", update);
+      vv?.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
   }, []);
@@ -62,10 +65,10 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     <div
       style={{
         position: "fixed",
-        top: 0,
         left: 0,
         right: 0,
-        height: vh ?? "100dvh",
+        top: vp ? vp.offsetTop : 0,
+        height: vp ? vp.height : "100dvh",
         background: "#FFFFFF",
         // Keep the app's content clear of the notch and home indicator; the white
         // padding reads as part of the (white) app, so it still looks edge to edge.
@@ -79,7 +82,7 @@ export default function MobileProto({ duet }: { duet: Duet }) {
             style={{
               position: "absolute",
               top: 0,
-              left: 0,
+              left: fit.left,
               width: SCREEN_WIDTH,
               height: fit.h,
               transform: `scale(${fit.scale})`,

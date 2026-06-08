@@ -12,6 +12,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // Resize the layout (not just the visual viewport) when the keyboard opens, so the
+  // on-device proto can refit above it instead of being covered.
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({

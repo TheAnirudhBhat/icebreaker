@@ -172,16 +172,18 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-    // Glide first, then snap a few times as late layout settles (entrance anims,
-    // card growth) so the newest message/card always lands fully above the compose
-    // bar instead of hiding behind it, and both phones converge to the same spot.
-    // Snaps are instant, so they never fight the glide or read as jerky.
+    // On the scaled device view a smooth glide fights a card's own entrance transform
+    // and reads as a jerk, so pin instantly there; desktop keeps the smooth glide.
+    el.scrollTo({ top: el.scrollHeight, behavior: onDevice ? "auto" : "smooth" });
+    // Re-pin a few times as late layout settles (card growth), but only when we're not
+    // already at the bottom, so a settled card never gets a redundant end-jerk.
     const snaps = [120, 350, 700].map((d) =>
-      window.setTimeout(() => el.scrollTo({ top: el.scrollHeight, behavior: "auto" }), d)
+      window.setTimeout(() => {
+        if (el.scrollHeight - el.scrollTop - el.clientHeight > 4) el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
+      }, d)
     );
     return () => snaps.forEach((t) => window.clearTimeout(t));
-  }, [duet.messages, phase, revealed, nudgeVisible, bothPlayed]);
+  }, [duet.messages, phase, revealed, nudgeVisible, bothPlayed, onDevice]);
 
   // Keyboard open/close gets its own single smooth scroll, fired after the chat's
   // padding transition (250ms) finishes, so it never competes with the content
@@ -386,8 +388,9 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
               zIndex: 31,
               background: BG_PRIMARY,
               // Keyboard up: drop the home-indicator inset so the input sits ~24px
-              // above the keyboard's top edge instead of leaving a dead gap.
-              padding: `16px 14px ${kbVisible ? 10 : BOTTOM_INSET}px`,
+              // above the keyboard's top edge instead of leaving a dead gap. On device
+              // the OS safe-area already clears the home indicator, so trim 12px there.
+              padding: `16px 14px ${kbVisible ? 10 : onDevice ? 8 : BOTTOM_INSET}px`,
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
