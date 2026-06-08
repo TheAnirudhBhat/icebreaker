@@ -35,7 +35,7 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
-      // Fill the full width (edge to edge), so there are no side margins/boxes — even
+      // Fill the full width (edge to edge), so there are no side margins/boxes, even
       // behind the dimmed sheet scrim. A fixed-width design fills only by scaling up, so
       // text scales with the screen (the tradeoff for zero margins).
       const scale = Math.max(1, w / SCREEN_WIDTH);
