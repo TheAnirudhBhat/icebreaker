@@ -453,6 +453,6 @@ body {
   .mobile-blocker { display: flex !important; }
 }
 
-/* On a real device the OS draws its own home indicator, so drop the in-app
-   gesture bar everywhere inside the on-device view (chat + every full-screen step). */
-.on-device .gesture-nav { display: none; }
+/* Hide the scrollbar on the chat thread (it stays scrollable). */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }

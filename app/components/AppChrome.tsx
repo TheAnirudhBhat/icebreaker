@@ -1,11 +1,15 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { typography } from "../lib/typography";
 import { BG_PRIMARY, ALPHA_BLACK_30, TEXT_PRIMARY } from "../lib/colors";
 
 export const STATUS_BAR_HEIGHT = 54; // clears the bezel's baked-in Dynamic Island
 export const BOTTOM_INSET = 20; // gesture nav: 8px + 4px bar + 8px
+
+// True inside the on-device (single-phone) view. Lets deeply-nested chrome drop the
+// bits the real OS already provides (the home indicator) without prop-threading.
+export const OnDeviceContext = createContext(false);
 
 // ── Status bar (iPhone, ported from the explore-slice proto) ────────────────
 
@@ -86,9 +90,13 @@ export function StatusBarSpacer({ backgroundColor = "transparent" }: { backgroun
 // ── Gesture nav indicator ───────────────────────────────────────────────────
 
 export function GestureNav({ backgroundColor = "transparent" }: { backgroundColor?: string }) {
+  // On a real device the OS draws the home indicator, so drop the in-app gesture bar
+  // and leave a 12px buffer so content never sticks to the bottom edge.
+  const onDevice = useContext(OnDeviceContext);
+  if (onDevice) return <div aria-hidden="true" className="shrink-0" style={{ height: 12 }} />;
   return (
     <div
-      className="gesture-nav shrink-0 flex items-center justify-center"
+      className="shrink-0 flex items-center justify-center"
       style={{ backgroundColor, paddingTop: 8, paddingBottom: 8 }}
       aria-hidden="true"
     >

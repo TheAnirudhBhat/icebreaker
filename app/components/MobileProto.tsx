@@ -73,7 +73,7 @@ export default function MobileProto({ duet }: { duet: Duet }) {
       }}
     >
       <div ref={areaRef} style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-        <div className="on-device" style={{ width: SCREEN_WIDTH, height: fit.h, zoom: fit.zoom || 1, opacity: fit.zoom ? 1 : 0, position: "relative", overflow: "hidden" }}>
+        <div style={{ width: SCREEN_WIDTH, height: fit.h, zoom: fit.zoom || 1, opacity: fit.zoom ? 1 : 0, position: "relative", overflow: "hidden" }}>
           <PlayerPhone duet={duet} selfId="me" onDevice />
         </div>
       </div>

@@ -18,7 +18,7 @@ import {
   ALPHA_WHITE_FF,
 } from "../lib/colors";
 import { RADIUS_PILL, RADIUS_M } from "../lib/radii";
-import { AppBar, NavButton, GestureNav, StatusBar, BOTTOM_INSET } from "./AppChrome";
+import { AppBar, NavButton, GestureNav, StatusBar, BOTTOM_INSET, OnDeviceContext } from "./AppChrome";
 import MatchHeader from "./MatchHeader";
 import Avatar from "./Avatar";
 import TriggerCard from "./TriggerCard";
@@ -237,6 +237,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
   };
 
   return (
+    <OnDeviceContext.Provider value={onDevice}>
     <div ref={phoneRef} style={{ height: "100%", position: "relative", background: BG_PRIMARY, overflow: "hidden" }}>
       {pushVisible && !pushDismissed && (
         <PushBanner
@@ -257,7 +258,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
       <div style={{ height: "100%", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? KEYBOARD_HEIGHT : 0, transition: "padding-bottom var(--dur-base) var(--ease)" }}>
         <MatchHeader other={otherPerson} onBack={duet.reset} onDevice={onDevice} />
 
-        <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? 16 : 24 }}>
+        <div ref={scrollRef} className="no-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? 16 : 24 }}>
           {/* the like + start-chat history stays through every phase */}
           <ChatStart self={selfPerson} other={otherPerson} />
 
@@ -493,5 +494,6 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
         </div>
       )}
     </div>
+    </OnDeviceContext.Provider>
   );
 }

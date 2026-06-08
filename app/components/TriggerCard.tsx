@@ -1,9 +1,9 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useContext, type CSSProperties } from "react";
 import { FONT_SERIF, FONT_SANS } from "../lib/typography";
 import { TEXT_PRIMARY, TEXT_TERTIARY, BG_SHEET, MAIN_PRIMARY, ALPHA_WHITE_FF } from "../lib/colors";
-import { GestureNav } from "./AppChrome";
+import { GestureNav, OnDeviceContext } from "./AppChrome";
 
 const FEATHER = "radial-gradient(ellipse 86% 84% at 50% 48%, #000 70%, transparent 100%)";
 
@@ -22,9 +22,12 @@ export default function TriggerCard({
 }: {
   onContinue: () => void;
 }) {
+  // On the single-phone device view the screen is taller, so center the content
+  // block with a slight upward bias instead of letting it sit at the top.
+  const onDevice = useContext(OnDeviceContext);
   return (
     <div style={{ background: BG_SHEET, display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ flex: 1, overflowY: "auto", padding: "0px 24px 8px" }}>
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", justifyContent: onDevice ? "center" : "flex-start", padding: onDevice ? "0px 24px 48px" : "0px 24px 8px" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icebreaker-hero.png" alt="" style={{ width: 282, maxWidth: "100%", height: "auto", display: "block", marginTop: -20, WebkitMaskImage: FEATHER, maskImage: FEATHER }} />
