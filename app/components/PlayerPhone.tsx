@@ -265,7 +265,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
           <ChatStart self={selfPerson} other={otherPerson} />
 
           {nudgeVisible && (
-            <div className={onDevice ? "anim-soft-in" : "anim-nudge-up"} style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <div className={onDevice ? "anim-fade-soft" : "anim-nudge-up"} style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
               <ChatTimestamp />
               <div
                 role="button"
@@ -326,7 +326,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
                   // A true 3D flip. Canonical setup: an invisible content spacer sets the
                   // card height, both faces are absolute with hidden backfaces, perspective
                   // lives on the parent. Tapping rotates the card to present the details.
-                  <div className="anim-nudge-up" style={{ padding: "8px 24px 16px", perspective: 1400 }}>
+                  <div className={onDevice ? "anim-fade-soft" : "anim-nudge-up"} style={{ padding: "8px 24px 16px", perspective: 1400 }}>
                     <div
                       style={{
                         position: "relative",
@@ -404,7 +404,9 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
                   if (e.key === "Enter") handleSend();
                 }}
                 placeholder="Send a message"
-                style={{ flex: 1, height: 44, ...typography.bodyNormal, color: TEXT_PRIMARY, background: "transparent", border: `1px solid ${OUTLINE_BOLD}`, borderRadius: RADIUS_PILL, padding: "0 18px", outline: "none" }}
+                // 16px on device so iOS doesn't auto-zoom the page on focus (which then
+                // cascades into a re-measure/rescale). Desktop keeps the 15px design size.
+                style={{ flex: 1, height: 44, ...typography.bodyNormal, fontSize: onDevice ? 16 : typography.bodyNormal.fontSize, color: TEXT_PRIMARY, background: "transparent", border: `1px solid ${OUTLINE_BOLD}`, borderRadius: RADIUS_PILL, padding: "0 18px", outline: "none" }}
               />
               {draft.trim() ? (
                 <button

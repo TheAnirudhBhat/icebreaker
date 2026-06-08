@@ -236,7 +236,7 @@ export default function Page() {
     <>
       {/* Phones only support portrait; in landscape we ask them to rotate. A website
           can't force orientation, so this is a CSS-gated blocker (landscape + short). */}
-      <div className="landscape-blocker" style={{ minHeight: "100dvh", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "40px 28px", background: "#FFFFFF" }}>
+      <div className="landscape-blocker" style={{ height: "100dvh", overflow: "hidden", overscrollBehavior: "none", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "40px 28px", background: "#FFFFFF" }}>
         <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 30, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
           Rotate your phone
         </div>
@@ -248,7 +248,7 @@ export default function Page() {
       {/* The proto is two phones side by side, so it wants a desktop-width screen.
           On mobile (CSS .mobile-blocker) we show a short note plus a CTA to explore
           one phone right on the device. */}
-      <div className="mobile-blocker" style={{ minHeight: "100dvh", flexDirection: "column" }}>
+      <div className="mobile-blocker" style={{ height: "100dvh", overflow: "hidden", overscrollBehavior: "none", flexDirection: "column" }}>
         {entered ? (
           <MobileProto duet={duet} />
         ) : (
