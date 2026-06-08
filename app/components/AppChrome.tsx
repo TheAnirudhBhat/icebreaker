@@ -88,7 +88,7 @@ export function StatusBarSpacer({ backgroundColor = "transparent" }: { backgroun
 export function GestureNav({ backgroundColor = "transparent" }: { backgroundColor?: string }) {
   return (
     <div
-      className="shrink-0 flex items-center justify-center"
+      className="gesture-nav shrink-0 flex items-center justify-center"
       style={{ backgroundColor, paddingTop: 8, paddingBottom: 8 }}
       aria-hidden="true"
     >

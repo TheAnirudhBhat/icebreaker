@@ -39,7 +39,7 @@ const KEYBOARD_HEIGHT = 300;
 
 // A Hinge iOS push that drops in below the Dynamic Island the moment the other
 // person submits their answers.
-function PushBanner({ body, onDismiss, screenRef }: { body: string; onDismiss: () => void; screenRef: React.RefObject<HTMLDivElement | null> }) {
+function PushBanner({ body, onDismiss, screenRef, onDevice = false }: { body: string; onDismiss: () => void; screenRef: React.RefObject<HTMLDivElement | null>; onDevice?: boolean }) {
   // A Hinge iOS push that drops in, then cleanly slides away. It never blocks the
   // screen: a tap anywhere on THIS phone dismisses it via a listener that doesn't
   // swallow the tap (so the tapped element still does its thing). Tapping the banner
@@ -70,7 +70,9 @@ function PushBanner({ body, onDismiss, screenRef }: { body: string; onDismiss: (
         if (exiting) onDismiss();
       }}
       className={exiting ? "anim-push-up" : "anim-push-down"}
-      style={{ position: "absolute", top: 56, left: 10, right: 10, zIndex: 52, cursor: "pointer" }}
+      // On a real device the app bar sits at the very top (no status-bar spacer), so
+      // drop the banner above it; off-device it clears the on-screen status bar.
+      style={{ position: "absolute", top: onDevice ? 8 : 56, left: 10, right: 10, zIndex: 52, cursor: "pointer" }}
     >
       <div
         style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 11, background: "rgba(250,250,252,0.98)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 22, padding: "12px 14px", boxShadow: "0 22px 46px -16px rgba(26,22,20,0.5)" }}
@@ -241,6 +243,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
           body={`${otherPerson.name} started a conversation with Icebreaker. Answer yours to reveal.`}
           onDismiss={() => setPushDismissed(true)}
           screenRef={phoneRef}
+          onDevice={onDevice}
         />
       )}
       {readyPush && (
@@ -248,6 +251,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
           body={`${otherPerson.name} answered too. Your Icebreaker is ready.`}
           onDismiss={() => setReadyPush(false)}
           screenRef={phoneRef}
+          onDevice={onDevice}
         />
       )}
       <div style={{ height: "100%", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? KEYBOARD_HEIGHT : 0, transition: "padding-bottom var(--dur-base) var(--ease)" }}>
@@ -442,6 +446,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
         <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           <AppBar
             backgroundColor={BG_SHEET}
+            hideStatusBar={onDevice}
             leading={
               phase === "playing" && self.index > 0 ? (
                 <NavButton kind="back" onClick={() => duet.goBack(selfId)} ariaLabel="Previous question" />

@@ -248,13 +248,13 @@ export default function Page() {
             <p style={{ fontFamily: FONT_SERIF, fontWeight: 400, fontSize: 19, lineHeight: "27px", color: TEXT_SECONDARY, maxWidth: 300, margin: "14px 0 0" }}>
               Built for desktop, where both phones sit side by side. You can still explore one phone right here.
             </p>
-            {/* CTA: full-width (matching the explainer/pitch CTA), 40px below the text.
-                DLS 2.0 Primary (48px, pill, 16/24 medium), proto plum. */}
+            {/* CTA: DLS 2.0 Secondary (transparent, plum label, hairline border, pill),
+                hugging its label and sitting 40px below the text. */}
             <button
               type="button"
               onClick={() => setEntered(true)}
               className="transition-transform active:scale-[0.98]"
-              style={{ marginTop: 40, width: "100%", height: 48, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT_SANS, fontWeight: 500, fontSize: 16, lineHeight: "24px", letterSpacing: "0.32px", color: "#FFFFFF", background: MAIN_PRIMARY, border: "none", borderRadius: 100, cursor: "pointer" }}
+              style={{ marginTop: 40, height: 48, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 28px", fontFamily: FONT_SANS, fontWeight: 600, fontSize: 16, lineHeight: "24px", letterSpacing: "0.32px", color: MAIN_PRIMARY, background: "transparent", border: "1px solid rgba(0,0,0,0.2)", borderRadius: 100, cursor: "pointer" }}
             >
               Enter the proto
             </button>

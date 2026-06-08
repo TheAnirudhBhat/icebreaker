@@ -452,3 +452,7 @@ body {
   .desktop-app { display: none !important; }
   .mobile-blocker { display: flex !important; }
 }
+
+/* On a real device the OS draws its own home indicator, so drop the in-app
+   gesture bar everywhere inside the on-device view (chat + every full-screen step). */
+.on-device .gesture-nav { display: none; }
