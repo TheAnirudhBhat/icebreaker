@@ -465,9 +465,11 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
       >
         {/* One sheet that morphs between steps. The app bar is shared and stays put;
             only the step content below it slides in horizontally on phase change. */}
-        <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <div style={{ height: "100%", display: "flex", flexDirection: "column", background: BG_SHEET }}>
           <AppBar
-            backgroundColor={BG_SHEET}
+            // Intro (Break the ice) uses a transparent bar so the page reads full-bleed; the
+            // column behind it is BG_SHEET, so the floating close button leaves no seam.
+            backgroundColor={phase === "intro" ? "transparent" : BG_SHEET}
             hideStatusBar={onDevice}
             leading={
               phase === "playing" && self.index > 0 ? (
