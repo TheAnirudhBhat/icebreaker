@@ -124,7 +124,7 @@ function TheirBubble({ text, person }: { text: string; person: Person }) {
 
 // A chat day/time separator (Figma 107-2139): Modern Era 12px, #AFADAB, centered.
 // Sits above each card that drops into the thread (nudge, sealed wait, reveal).
-function ChatTimestamp({ time = "1:45 PM" }: { time?: string }) {
+function ChatTimestamp({ time = "3:42 PM" }: { time?: string }) {
   return (
     <p style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 12, lineHeight: "16px", color: "#AFADAB", textAlign: "center", margin: 0 }}>
       <span style={{ fontWeight: 600 }}>Today</span> {time}
@@ -343,7 +343,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
               )}
               {duet.messages.some((m) => m.from !== "system") && (
                 <div style={{ display: "flex", justifyContent: "center", padding: "12px 16px 8px" }}>
-                  <ChatTimestamp time="1:50 PM" />
+                  <ChatTimestamp time="3:47 PM" />
                 </div>
               )}
               {duet.messages.map((m) =>

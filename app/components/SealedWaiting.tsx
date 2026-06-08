@@ -30,7 +30,7 @@ export default function SealedWaiting({ other }: { other: Person }) {
       </span>
 
       <p style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: "0.07px", color: TEXT_PRIMARY, textAlign: "center", width: 206, margin: 0 }}>
-        Your Icebreaker opens up as soon as {other.name} answers too.
+        Icebreakers will be available as soon as {other.name} answers too.
       </p>
     </div>
   );
