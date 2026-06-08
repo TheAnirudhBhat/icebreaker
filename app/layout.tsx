@@ -22,6 +22,15 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Preload every self-hosted face so the right font is ready before first paint
+            (otherwise the phone briefly shows a fallback, then swaps). */}
+        <link rel="preload" href="/fonts/ModernEra-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/ModernEra-Italic.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/TiemposHeadline-Regular.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/TiemposHeadline-RegularItalic.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/TiemposHeadline-Medium.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/TiemposHeadline-MediumItalic.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/TiemposHeadline-Semibold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"

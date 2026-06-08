@@ -258,7 +258,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
       <div style={{ height: "100%", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? KEYBOARD_HEIGHT : 0, transition: "padding-bottom var(--dur-base) var(--ease)" }}>
         <MatchHeader other={otherPerson} onBack={duet.reset} onDevice={onDevice} />
 
-        <div ref={scrollRef} className="no-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? 16 : 24 }}>
+        <div ref={scrollRef} className="no-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", paddingBottom: onDevice ? 0 : kbVisible ? 16 : 24 }}>
           {/* the like + start-chat history stays through every phase */}
           <ChatStart self={selfPerson} other={otherPerson} />
 

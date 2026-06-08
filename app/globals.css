@@ -85,6 +85,10 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  /* Stop mobile Safari/Chrome from auto-inflating or shrinking text in the scaled
+     phone view, so type renders at the size we set. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* ============ KEYFRAMES ============ */

@@ -245,8 +245,8 @@ export default function Page() {
             <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 30, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
               Icebreaker
             </div>
-            <p style={{ fontFamily: FONT_SERIF, fontWeight: 400, fontSize: 19, lineHeight: "27px", color: TEXT_SECONDARY, maxWidth: 320, margin: "14px 0 0" }}>
-              Icebreaker is a two-person game that plays out across both phones at once, so it&apos;s best on desktop where they sit side by side. On your phone, you can still step through one side of it.
+            <p style={{ fontFamily: FONT_SERIF, fontWeight: 400, fontSize: 19, lineHeight: "27px", color: TEXT_SECONDARY, maxWidth: 300, margin: "14px 0 0" }}>
+              A two-person concept. See both sides on desktop, or one side here on your phone. Desktop recommended.
             </p>
             {/* CTA: DLS 2.0 Secondary (transparent, plum label, hairline border, pill),
                 hugging its label and sitting 40px below the text. */}

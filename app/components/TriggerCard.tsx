@@ -35,7 +35,7 @@ export default function TriggerCard({
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 40, width: "100%" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 16 }}>
               <h2 style={{ fontFamily: FONT_SERIF, fontWeight: 600, fontSize: 30, lineHeight: "31px", letterSpacing: "-0.4px", color: TEXT_PRIMARY, margin: 0, maxWidth: 240 }}>
-                Break the ice, together
+                Break the ice<br />together
               </h2>
               <p style={{ fontFamily: FONT_SANS, fontWeight: 400, fontSize: 14, lineHeight: "18px", color: TEXT_PRIMARY, margin: 0, padding: "0 8px" }}>
                 Connect your music and social apps, both answer a few questions, then see what you have in common.

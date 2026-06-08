@@ -113,7 +113,8 @@ export default function ConnectStep({
           <div style={{ width: 150, height: 124, display: "flex" }}>
             <Lottie animationData={hingeLoader} loop autoplay onDOMLoaded={() => setLottieReady(true)} onLoopComplete={handleLoop} style={{ width: "100%", height: "100%" }} />
           </div>
-          <span key={genStep} className="anim-soft-in" style={{ fontFamily: FONT_SANS, fontWeight: 600, fontSize: 18, lineHeight: "24px", color: TEXT_PRIMARY, textAlign: "center", maxWidth: 160 }}>{GEN_STEPS[genStep]}</span>
+          {/* Reserve two lines of height so swapping status lines never shifts the loader. */}
+          <span key={genStep} className="anim-soft-in" style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 48, fontFamily: FONT_SANS, fontWeight: 600, fontSize: 18, lineHeight: "24px", color: TEXT_PRIMARY, textAlign: "center", maxWidth: 160 }}>{GEN_STEPS[genStep]}</span>
         </div>
       </div>
     );

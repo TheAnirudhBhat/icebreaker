@@ -5,16 +5,17 @@ import PlayerPhone from "./PlayerPhone";
 import { SCREEN_WIDTH } from "./DeviceFrame";
 import type { Duet } from "../hooks/useDuet";
 
-// On-phone view of the proto: one phone (Arjun's), edge to edge. The 360-wide app
-// is scaled with `zoom` to FILL the device width, and its logical height is set so
-// that after the zoom it fills the available height too, so the screen reaches every
-// edge with no letterbox. The app's own header and compose bar carry the safe-area
-// insets (via the padded container), so nothing sits under the notch or home
-// indicator. The container tracks the visual viewport, so when the device keyboard
-// opens the phone refits into the space above it and the compose bar stays visible.
+// On-phone view of the proto: one phone (Arjun's), edge to edge. The 360-wide app is
+// scaled with `transform: scale` to fill the device width. We use transform, not the
+// CSS `zoom` property, because `zoom` renders inconsistently on mobile Safari (the
+// proto looked right in desktop device-emulation but broke on real phones). The scale
+// never drops below 1, so text always renders at least its design size and never goes
+// illegibly small. The container tracks the visual viewport, so when the device
+// keyboard opens the phone refits into the space above it and the compose bar stays
+// visible.
 export default function MobileProto({ duet }: { duet: Duet }) {
   const areaRef = useRef<HTMLDivElement>(null);
-  const [fit, setFit] = useState<{ zoom: number; h: number }>({ zoom: 0, h: 0 }); // 0 until measured, so it never flashes unscaled
+  const [fit, setFit] = useState<{ scale: number; h: number } | null>(null); // null until measured, so it never flashes unscaled
   const [vh, setVh] = useState<number | undefined>(undefined);
 
   // There's no second phone on the device view, so once you seal your answers,
@@ -27,15 +28,15 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     return () => window.clearTimeout(t);
   }, [sealed, duet.aanyaAutoPlay]);
 
-  // Fill the width edge to edge, then size the logical height so the zoomed phone
-  // fills the whole available area (height * zoom == area height). Refit whenever
-  // the area changes (rotation, or the keyboard shrinking the viewport).
+  // Fill the width (never shrinking below 1:1), then size the logical height so the
+  // scaled phone fills the whole available area. Refit whenever the area changes
+  // (rotation, or the keyboard shrinking the viewport).
   useLayoutEffect(() => {
     const el = areaRef.current;
     if (!el) return;
     const measure = () => {
-      const zoom = el.clientWidth / SCREEN_WIDTH;
-      setFit({ zoom, h: zoom > 0 ? el.clientHeight / zoom : 0 });
+      const scale = Math.max(1, el.clientWidth / SCREEN_WIDTH);
+      setFit({ scale, h: el.clientHeight / scale });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -72,10 +73,22 @@ export default function MobileProto({ duet }: { duet: Duet }) {
         boxSizing: "border-box",
       }}
     >
-      <div ref={areaRef} style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-        <div style={{ width: SCREEN_WIDTH, height: fit.h, zoom: fit.zoom || 1, opacity: fit.zoom ? 1 : 0, position: "relative", overflow: "hidden" }}>
-          <PlayerPhone duet={duet} selfId="me" onDevice />
-        </div>
+      <div ref={areaRef} style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
+        {fit && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: SCREEN_WIDTH,
+              height: fit.h,
+              transform: `scale(${fit.scale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            <PlayerPhone duet={duet} selfId="me" onDevice />
+          </div>
+        )}
       </div>
     </div>
   );
