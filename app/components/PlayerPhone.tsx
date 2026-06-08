@@ -465,21 +465,24 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
       >
         {/* One sheet that morphs between steps. The app bar is shared and stays put;
             only the step content below it slides in horizontally on phase change. */}
-        <div style={{ height: "100%", display: "flex", flexDirection: "column", background: BG_SHEET }}>
-          <AppBar
-            // Intro (Break the ice) uses a transparent bar so the page reads full-bleed; the
-            // column behind it is BG_SHEET, so the floating close button leaves no seam.
-            backgroundColor={phase === "intro" ? "transparent" : BG_SHEET}
-            hideStatusBar={onDevice}
-            leading={
-              phase === "playing" && self.index > 0 ? (
-                <NavButton kind="back" onClick={() => duet.goBack(selfId)} ariaLabel="Previous question" />
-              ) : (
-                <span style={{ width: 48 }} />
-              )
-            }
-            trailing={<NavButton kind="close" onClick={() => duet.dismiss(selfId)} ariaLabel="Close" />}
-          />
+        <div style={{ height: "100%", display: "flex", flexDirection: "column", background: BG_SHEET, position: "relative" }}>
+          {/* Intro (Break the ice): the app bar OVERLAYS the page (transparent + absolute) so
+              the illustration gets the full height and isn't clipped at the bar's edge, with
+              the close button floating on top. Other steps keep it in normal flow. */}
+          <div style={phase === "intro" ? { position: "absolute", top: 0, left: 0, right: 0, zIndex: 2 } : undefined}>
+            <AppBar
+              backgroundColor={phase === "intro" ? "transparent" : BG_SHEET}
+              hideStatusBar={onDevice}
+              leading={
+                phase === "playing" && self.index > 0 ? (
+                  <NavButton kind="back" onClick={() => duet.goBack(selfId)} ariaLabel="Previous question" />
+                ) : (
+                  <span style={{ width: 48 }} />
+                )
+              }
+              trailing={<NavButton kind="close" onClick={() => duet.dismiss(selfId)} ariaLabel="Close" />}
+            />
+          </div>
           <div key={`step-${phase}`} className={phase === "intro" ? undefined : "anim-push-in"} style={{ flex: 1, minHeight: 0 }}>
             {phase === "intro" && <TriggerCard onContinue={() => duet.startGame(selfId)} />}
             {phase === "connect" && (

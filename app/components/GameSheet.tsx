@@ -107,7 +107,7 @@ export default function GameSheet({
     ro.observe(inner);
     measure();
     return () => ro.disconnect();
-  }, [open, isSheet, mounted, fullHeight, expanded]);
+  }, [open, isSheet, mounted, fullHeight, expanded, onDevice]);
 
   if (!mounted) return null;
   const content = open ? children : lastChildren.current;

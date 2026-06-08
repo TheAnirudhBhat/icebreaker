@@ -27,7 +27,7 @@ export default function TriggerCard({
   const onDevice = useContext(OnDeviceContext);
   return (
     <div style={{ background: BG_SHEET, display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ flex: 1, overflowY: onDevice ? "hidden" : "auto", overscrollBehavior: "none", display: "flex", flexDirection: "column", justifyContent: onDevice ? "center" : "flex-start", padding: onDevice ? "0px 24px 48px" : "0px 24px 8px" }}>
+      <div style={{ flex: 1, overflowY: onDevice ? "hidden" : "auto", overscrollBehavior: "none", display: "flex", flexDirection: "column", justifyContent: onDevice ? "center" : "flex-start", padding: onDevice ? "0px 24px 24px" : "0px 24px 8px" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icebreaker-hero.png" alt="" style={{ width: 282, maxWidth: "100%", height: "auto", display: "block", marginTop: -20, WebkitMaskImage: FEATHER, maskImage: FEATHER }} />

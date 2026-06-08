@@ -34,7 +34,11 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     const el = areaRef.current;
     if (!el) return;
     const measure = () => {
-      const scale = el.clientWidth / SCREEN_WIDTH;
+      const w = el.clientWidth;
+      // Guard a 0-width measure (e.g. mid-transition): scale 0 would divide the height by
+      // zero (Infinity) and blank the phone.
+      if (!w) return;
+      const scale = w / SCREEN_WIDTH;
       setFit({ scale, h: el.clientHeight / scale });
     };
     measure();

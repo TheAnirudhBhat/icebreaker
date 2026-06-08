@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { typography } from "../lib/typography";
 import { BG_PRIMARY, ALPHA_BLACK_30, TEXT_PRIMARY } from "../lib/colors";
 
@@ -209,45 +209,6 @@ export function AppBar({
           </div>
         ) : null}
       </div>
-    </div>
-  );
-}
-
-// ── Footer inset ────────────────────────────────────────────────────────────
-
-type FooterInsetProps = {
-  children?: ReactNode;
-  backgroundColor?: string;
-  paddingX?: number;
-  paddingTop?: number;
-  minBottomPadding?: number;
-  boxShadow?: string;
-  style?: CSSProperties;
-};
-
-export function FooterInset({
-  children,
-  backgroundColor = BG_PRIMARY,
-  paddingX = 16,
-  paddingTop = 8,
-  minBottomPadding = 12,
-  boxShadow,
-  style,
-}: FooterInsetProps) {
-  return (
-    <div
-      className="shrink-0"
-      style={{
-        backgroundColor,
-        paddingLeft: paddingX,
-        paddingRight: paddingX,
-        paddingTop,
-        paddingBottom: minBottomPadding,
-        boxShadow,
-        ...style,
-      }}
-    >
-      {children}
     </div>
   );
 }
