@@ -2,17 +2,18 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import PlayerPhone from "./PlayerPhone";
+import { SCREEN_WIDTH } from "./DeviceFrame";
 import type { Duet } from "../hooks/useDuet";
 
-// On-phone view of the proto: one phone (Arjun's). The app is scaled with `transform:
-// scale` (not the CSS `zoom` property, which renders inconsistently on mobile Safari). We
-// render at 0.95 (so text never reads oversized) on a canvas widened to clientWidth / 0.95, so
-// the scaled phone fills the screen edge to edge with no side margins. The stage is pinned to
-// the visual viewport (height + offset), so when the keyboard opens the phone refits into the
-// space above it and follows iOS's scroll instead of glitching out.
+// On-phone view of the proto: one phone (Arjun's), rendered at the SAME 360-wide canvas as
+// the desktop shell so it looks identical (14px renders at 14px). We never scale ABOVE 1:1,
+// so text matches the desktop and is never blown up; on a phone wider than 360 the phone
+// sits centered with small side margins, and on a narrower one it shrinks to fit. The stage
+// is pinned to the visual viewport (height + offset), so when the keyboard opens the phone
+// refits into the space above it and follows iOS's scroll instead of glitching out.
 export default function MobileProto({ duet }: { duet: Duet }) {
   const areaRef = useRef<HTMLDivElement>(null);
-  const [fit, setFit] = useState<{ scale: number; h: number; w: number } | null>(null);
+  const [fit, setFit] = useState<{ scale: number; h: number; left: number } | null>(null);
   const [vp, setVp] = useState<{ height: number; offsetTop: number } | null>(null);
 
   // There's no second phone on the device view, so once you seal your answers,
@@ -25,16 +26,17 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     return () => window.clearTimeout(t);
   }, [sealed, duet.aanyaAutoPlay]);
 
-  // Edge to edge at 0.9: render the app at scale 0.9 (so text never reads oversized) but
-  // widen the canvas to clientWidth / 0.9, so the scaled phone exactly fills the screen
-  // (canvas * 0.9 = clientWidth) with no side margins. Height matches the same way. Refit
-  // whenever the area changes (rotation, or the keyboard shrinking the viewport).
+  // Render the 360-wide design at 1:1 (native, exactly like the desktop shell), capped so a
+  // phone narrower than 360 shrinks to fit instead of overflowing. Size the height so the
+  // phone fills the area vertically, and center it horizontally (small margins on a wider
+  // phone). Refit whenever the area changes (rotation, or the keyboard shrinking the viewport).
   useLayoutEffect(() => {
     const el = areaRef.current;
     if (!el) return;
     const measure = () => {
-      const scale = 0.95;
-      setFit({ scale, h: el.clientHeight / scale, w: el.clientWidth / scale });
+      const w = el.clientWidth;
+      const scale = Math.min(1, w / SCREEN_WIDTH);
+      setFit({ scale, h: el.clientHeight / scale, left: Math.max(0, (w - SCREEN_WIDTH * scale) / 2) });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -80,8 +82,8 @@ export default function MobileProto({ duet }: { duet: Duet }) {
             style={{
               position: "absolute",
               top: 0,
-              left: 0,
-              width: fit.w,
+              left: fit.left,
+              width: SCREEN_WIDTH,
               height: fit.h,
               transform: `scale(${fit.scale})`,
               transformOrigin: "top left",
