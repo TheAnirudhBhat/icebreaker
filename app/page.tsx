@@ -5,6 +5,7 @@ import DeviceFrame from "./components/DeviceFrame";
 import PlayerPhone from "./components/PlayerPhone";
 import ProtoControls from "./components/ProtoControls";
 import { useDuet } from "./hooks/useDuet";
+import { usePreloadAssets } from "./hooks/usePreloadAssets";
 import { typography, FONT_SERIF, FONT_SANS } from "./lib/typography";
 import { TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, BG_SHEET, OUTLINE_SUBTLE, MAIN_PRIMARY } from "./lib/colors";
 import { ME, AANYA } from "./data/match";
@@ -211,6 +212,7 @@ function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) 
 export default function Page() {
   const duet = useDuet();
   const [notesOpen, setNotesOpen] = useState(false);
+  usePreloadAssets();
 
   const iceMessages = duet.messages.filter((m) => m.from !== "system").length;
   const bothPlayed = duet.me.submitted && duet.aanya.submitted;
