@@ -160,9 +160,10 @@ export default function ConnectStep({
                       </span>
                     </span>
                     {on ? (
-                      <span className="anim-reveal-pop" style={{ width: 22, height: 22, borderRadius: "50%", background: MAIN_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-                          <path d="M2.5 7.5L6 11L11.5 4" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                      <span className="anim-reveal-pop" style={{ width: 22, height: 22, borderRadius: "50%", background: MAIN_PRIMARY, display: "grid", placeItems: "center", flexShrink: 0 }}>
+                        {/* Path bbox centered in the viewBox (y was ~0.5 low); display:block drops the inline gap. */}
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" style={{ display: "block" }}>
+                          <path d="M2.5 7L6 10.5L11.5 3.5" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
                     ) : loading ? (
