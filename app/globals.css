@@ -91,6 +91,9 @@ body {
   text-size-adjust: 100%;
 }
 
+/* Snappy taps on mobile: skip the legacy double-tap delay so buttons fire instantly. */
+button, [role="button"], a, input { touch-action: manipulation; }
+
 /* ============ KEYFRAMES ============ */
 
 @keyframes fadeIn {

@@ -105,7 +105,7 @@ export default function ConnectStep({
     window.setTimeout(() => {
       onToggle(id);
       setConnecting((c) => c.filter((x) => x !== id));
-    }, 1000);
+    }, 400);
   };
 
   // Mock the question-generation step as a generic full-screen loader.
