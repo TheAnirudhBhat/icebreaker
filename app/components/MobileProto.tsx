@@ -7,9 +7,9 @@ import type { Duet } from "../hooks/useDuet";
 
 // On-phone view of the proto: one phone (Arjun's), near edge to edge. The 360-wide app
 // is scaled with `transform: scale` (not the CSS `zoom` property, which renders
-// inconsistently on mobile Safari). We fill the full width (edge to edge), so the design
-// scales up with the screen. Scale never drops below 1, so text never goes below its
-// design size. The stage is pinned to
+// inconsistently on mobile Safari). We render at native 1:1 (never upscaling), so type
+// matches the desktop proto exactly and never reads oversized; the 360-wide phone is
+// centered with white space on the sides. The stage is pinned to
 // the visual viewport (height + offset), so when the keyboard opens the phone refits
 // into the space above it and follows iOS's scroll instead of glitching out.
 export default function MobileProto({ duet }: { duet: Duet }) {
@@ -35,7 +35,9 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
-      const scale = Math.max(1, w / SCREEN_WIDTH);
+      // Never upscale: cap at native 1:1 so type matches the desktop proto and never
+      // reads oversized. Only shrinks below 1 on the rare sub-360px device.
+      const scale = Math.min(1, w / SCREEN_WIDTH);
       setFit({ scale, h: el.clientHeight / scale, left: Math.max(0, (w - SCREEN_WIDTH * scale) / 2) });
     };
     measure();
