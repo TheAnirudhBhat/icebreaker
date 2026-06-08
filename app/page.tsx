@@ -265,7 +265,7 @@ export default function Page() {
               type="button"
               onClick={() => setEntered(true)}
               className="transition-transform active:scale-[0.98]"
-              style={{ marginTop: 40, height: 48, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 28px", fontFamily: FONT_SANS, fontWeight: 600, fontSize: 16, lineHeight: "24px", color: MAIN_PRIMARY, background: "transparent", border: "1px solid rgba(0,0,0,0.2)", borderRadius: 100, cursor: "pointer" }}
+              style={{ marginTop: 40, height: 48, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 28px", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 16, lineHeight: "24px", color: MAIN_PRIMARY, background: "transparent", border: "1px solid rgba(0,0,0,0.2)", borderRadius: 100, cursor: "pointer" }}
             >
               Enter the proto
             </button>
