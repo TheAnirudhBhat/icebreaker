@@ -195,6 +195,22 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
     return () => window.clearTimeout(t);
   }, [kbVisible]);
 
+  // On a real device the keyboard is the OS keyboard: opening it shrinks the visual
+  // viewport (MobileProto refits the phone above it) but never flips kbVisible. Pin the
+  // chat to the bottom on each viewport change so the whole thread, the nudge included,
+  // rides up with the keyboard like a normal chat instead of the bottom slipping behind it.
+  useEffect(() => {
+    if (!onDevice) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const pin = () => {
+      const el = scrollRef.current;
+      if (el) el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
+    };
+    vv.addEventListener("resize", pin);
+    return () => vv.removeEventListener("resize", pin);
+  }, [onDevice]);
+
   useEffect(() => {
     if (!bothPlayed) {
       setRevealed(false);

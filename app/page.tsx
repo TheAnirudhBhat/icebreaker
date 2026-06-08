@@ -260,12 +260,13 @@ export default function Page() {
               A two-person concept. See both sides on desktop, or one side here on your phone. Desktop recommended.
             </p>
             {/* CTA: DLS 2.0 Secondary (transparent, plum label, hairline border, pill),
-                hugging its label and sitting 40px below the text. */}
+                hugging its label, 40px below the text. Label uses the buttonNormal type
+                token (Modern Era 600); ad-hoc 700 synthesized into a heavy fake-bold. */}
             <button
               type="button"
               onClick={() => setEntered(true)}
               className="transition-transform active:scale-[0.98]"
-              style={{ marginTop: 40, height: 48, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 28px", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 16, lineHeight: "24px", color: MAIN_PRIMARY, background: "transparent", border: "1px solid rgba(0,0,0,0.2)", borderRadius: 100, cursor: "pointer" }}
+              style={{ marginTop: 40, height: 48, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 28px", ...typography.buttonNormal, color: MAIN_PRIMARY, background: "transparent", border: "1px solid rgba(0,0,0,0.2)", borderRadius: 100, cursor: "pointer" }}
             >
               Enter the proto
             </button>
