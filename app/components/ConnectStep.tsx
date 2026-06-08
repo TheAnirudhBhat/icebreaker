@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { typography, FONT_SERIF, FONT_SANS } from "../lib/typography";
 import {
   TEXT_PRIMARY,
@@ -10,7 +10,7 @@ import {
   ALPHA_WHITE_FF,
 } from "../lib/colors";
 import { RADIUS_PILL } from "../lib/radii";
-import { GestureNav } from "./AppChrome";
+import { GestureNav, OnDeviceContext } from "./AppChrome";
 import { SERVICES, type ServiceId } from "../data/connects";
 import dynamic from "next/dynamic";
 import hingeLoader from "../data/hinge-loader.json";
@@ -44,6 +44,9 @@ export default function ConnectStep({
   const [genStep, setGenStep] = useState(0);
   const [lottieReady, setLottieReady] = useState(false);
   const anyConnected = (Object.values(connected) as boolean[]).some(Boolean);
+  // On the single-phone device view the loader read too high; nudge it ~12px lower
+  // so it sits visually centered. Desktop is left as-is.
+  const onDevice = useContext(OnDeviceContext);
 
   const genStepRef = useRef(0);
 
@@ -109,7 +112,7 @@ export default function ConnectStep({
   if (generating) {
     return (
       <div key="gen" className="anim-push-in" style={{ display: "flex", flexDirection: "column", height: "100%", background: BG_SHEET }}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: "24px", paddingBottom: 150, opacity: lottieReady ? 1 : 0, transition: "opacity var(--dur-entrance) var(--ease)" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: "24px", paddingBottom: onDevice ? 126 : 150, opacity: lottieReady ? 1 : 0, transition: "opacity var(--dur-entrance) var(--ease)" }}>
           <div style={{ width: 150, height: 124, display: "flex" }}>
             <Lottie animationData={hingeLoader} loop autoplay onDOMLoaded={() => setLottieReady(true)} onLoopComplete={handleLoop} style={{ width: "100%", height: "100%" }} />
           </div>
