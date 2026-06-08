@@ -6,7 +6,7 @@ import type { Duet } from "../hooks/useDuet";
 
 // On-phone view of the proto: one phone (Arjun's). The app is scaled with `transform:
 // scale` (not the CSS `zoom` property, which renders inconsistently on mobile Safari). We
-// render at 0.9 (so text never reads oversized) on a canvas widened to clientWidth / 0.9, so
+// render at 0.95 (so text never reads oversized) on a canvas widened to clientWidth / 0.95, so
 // the scaled phone fills the screen edge to edge with no side margins. The stage is pinned to
 // the visual viewport (height + offset), so when the keyboard opens the phone refits into the
 // space above it and follows iOS's scroll instead of glitching out.
@@ -33,7 +33,7 @@ export default function MobileProto({ duet }: { duet: Duet }) {
     const el = areaRef.current;
     if (!el) return;
     const measure = () => {
-      const scale = 0.9;
+      const scale = 0.95;
       setFit({ scale, h: el.clientHeight / scale, w: el.clientWidth / scale });
     };
     measure();
