@@ -1,9 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Icebreaker",
   description: "Post-match icebreaker game, concept prototype",
+};
+
+// viewport-fit=cover so env(safe-area-inset-*) reports real values on notched
+// phones (used by the on-phone proto view).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

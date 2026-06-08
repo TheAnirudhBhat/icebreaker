@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import DeviceFrame from "./components/DeviceFrame";
 import PlayerPhone from "./components/PlayerPhone";
 import ProtoControls from "./components/ProtoControls";
+import MobileProto from "./components/MobileProto";
 import { useDuet } from "./hooks/useDuet";
 import { usePreloadAssets } from "./hooks/usePreloadAssets";
 import { useStageFit } from "./hooks/useStageFit";
@@ -213,6 +214,7 @@ function DesignNotes({ open, onClose }: { open: boolean; onClose: () => void }) 
 export default function Page() {
   const duet = useDuet();
   const [notesOpen, setNotesOpen] = useState(false);
+  const [entered, setEntered] = useState(false); // mobile: explore one phone on the device
   usePreloadAssets();
   const fit = useStageFit();
 
@@ -232,27 +234,32 @@ export default function Page() {
 
   return (
     <>
-      {/* The proto is two phones side by side, so it needs a desktop-width screen.
-          On mobile we hide it (CSS, see .mobile-blocker) and show a short note. */}
-      <div
-        className="mobile-blocker"
-        style={{
-          minHeight: "100dvh",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "40px 32px",
-          background: "#FFFFFF",
-          gap: 14,
-        }}
-      >
-        <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 30, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
-          Icebreaker
-        </div>
-        <p style={{ fontFamily: FONT_SERIF, fontWeight: 400, fontSize: 19, lineHeight: "27px", color: TEXT_SECONDARY, maxWidth: 300, margin: 0 }}>
-          This prototype is best viewed on a desktop. Open it on a larger screen to explore.
-        </p>
+      {/* The proto is two phones side by side, so it wants a desktop-width screen.
+          On mobile (CSS .mobile-blocker) we show a short note plus a CTA to explore
+          one phone right on the device. */}
+      <div className="mobile-blocker" style={{ minHeight: "100dvh", flexDirection: "column" }}>
+        {entered ? (
+          <MobileProto duet={duet} />
+        ) : (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "40px 24px", background: "#FFFFFF" }}>
+            <div style={{ fontFamily: FONT_SERIF, fontStyle: "italic", fontWeight: 500, fontSize: 30, letterSpacing: "-0.5px", color: TEXT_PRIMARY }}>
+              Icebreaker
+            </div>
+            <p style={{ fontFamily: FONT_SERIF, fontWeight: 400, fontSize: 19, lineHeight: "27px", color: TEXT_SECONDARY, maxWidth: 300, margin: "14px 0 0" }}>
+              Built for desktop, where both phones sit side by side. You can still explore one phone right here.
+            </p>
+            {/* CTA: full-width (matching the explainer/pitch CTA), 40px below the text.
+                DLS 2.0 Primary (48px, pill, 16/24 medium), proto plum. */}
+            <button
+              type="button"
+              onClick={() => setEntered(true)}
+              className="transition-transform active:scale-[0.98]"
+              style={{ marginTop: 40, width: "100%", height: 48, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT_SANS, fontWeight: 500, fontSize: 16, lineHeight: "24px", letterSpacing: "0.32px", color: "#FFFFFF", background: MAIN_PRIMARY, border: "none", borderRadius: 100, cursor: "pointer" }}
+            >
+              Enter the proto
+            </button>
+          </div>
+        )}
       </div>
       <main
         className="desktop-app"

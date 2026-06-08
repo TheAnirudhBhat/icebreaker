@@ -17,12 +17,14 @@ export default function GameSheet({
   children,
   variant = "sheet",
   fullHeight = false,
+  onDevice = false,
 }: {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   variant?: "sheet" | "floating";
   fullHeight?: boolean;
+  onDevice?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -90,8 +92,8 @@ export default function GameSheet({
         h = wrap.clientHeight;
       } else if (expanded) {
         // Once a scrollable sheet has been expanded, it fills the page (minus a status
-        // bar inset so its content clears the iOS clock/battery).
-        h = wrap.clientHeight - STATUS_BAR_HEIGHT;
+        // bar inset so its content clears the iOS clock/battery; not needed on device).
+        h = wrap.clientHeight - (onDevice ? 0 : STATUS_BAR_HEIGHT);
       } else {
         const cap = wrap.clientHeight * (isSheet ? 0.92 : 0.86) - (isSheet ? 8 : 28);
         h = Math.min(inner.scrollHeight, cap);
@@ -142,7 +144,7 @@ export default function GameSheet({
           overflow: "hidden",
         }}
       >
-        {isSheet && expanded && <div aria-hidden style={{ height: STATUS_BAR_HEIGHT, flexShrink: 0, background: BG_PRIMARY }} />}
+        {isSheet && expanded && !onDevice && <div aria-hidden style={{ height: STATUS_BAR_HEIGHT, flexShrink: 0, background: BG_PRIMARY }} />}
         <div
           data-sheet-scroll
           data-expanded={expanded ? "true" : "false"}

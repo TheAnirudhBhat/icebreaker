@@ -21,6 +21,7 @@ const INSET_LEFT = 21.5;
 const SCREEN_RADIUS = 45;
 
 export const SCREEN_WIDTH = SCREEN_W;
+export const SCREEN_HEIGHT = SCREEN_H;
 export const BEZEL_SRC = "/iphone17_bezel.png";
 
 export default function DeviceFrame({ children }: { children: ReactNode }) {

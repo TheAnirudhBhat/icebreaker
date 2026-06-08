@@ -8,10 +8,12 @@ import type { Person } from "../data/match";
 const TAB_ACTIVE = "rgba(0,0,0,0.9)";
 
 // The Hinge chat header: back + name + overflow, then Chat / Profile tabs.
-export default function MatchHeader({ other, onBack }: { other: Person; onBack?: () => void }) {
+// On a real device (`onDevice`) the status-bar spacer is dropped, since the
+// device's own status bar (and the view's safe-area inset) already clear the top.
+export default function MatchHeader({ other, onBack, onDevice = false }: { other: Person; onBack?: () => void; onDevice?: boolean }) {
   return (
     <div style={{ background: BG_PRIMARY, flexShrink: 0 }}>
-      <StatusBarSpacer backgroundColor={BG_PRIMARY} />
+      {!onDevice && <StatusBarSpacer backgroundColor={BG_PRIMARY} />}
       <div style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
         <button
           type="button"

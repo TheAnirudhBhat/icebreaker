@@ -159,10 +159,13 @@ export function useDuet() {
     const t = text.trim();
     if (!t) return;
     setMessages((prev) => [...prev, { id: `${pid}-${prev.length}`, from: pid, text: t }]);
-  }, []);
-
-  const openChat = useCallback((pid: PlayerId) => {
-    setter(pid)((prev) => ({ ...prev, phase: "chat" }));
+    // The message belongs to the shared thread, so surface it on BOTH phones: any
+    // phone sitting on the idle chat (nudge / dismissed) drops into the conversation
+    // so it renders the incoming message. Phones mid-icebreaker are left alone.
+    const intoChat = (p: PlayerState): PlayerState =>
+      p.phase === "silent" || p.phase === "trigger" || p.phase === "dismissed" ? { ...p, phase: "chat" } : p;
+    setMe(intoChat);
+    setAanya(intoChat);
   }, []);
 
   const aanyaAutoPlay = useCallback(() => {
@@ -265,7 +268,6 @@ export function useDuet() {
     goBack,
     dismiss,
     sendMessage,
-    openChat,
     aanyaAutoPlay,
     aanyaPass,
     startNewRound,

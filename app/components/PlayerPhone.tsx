@@ -132,7 +132,11 @@ function ChatTimestamp({ time = "3:42 PM" }: { time?: string }) {
   );
 }
 
-export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: PlayerId }) {
+// `onDevice` = the proto is running on a real phone (the on-device view), so we
+// drop the chrome the device already provides (its own status bar) and the PNG
+// keyboard. Typing uses the real device keyboard; MobileProto refits the phone
+// above it via the visual viewport.
+export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: Duet; selfId: PlayerId; onDevice?: boolean }) {
   const self = duet[selfId];
   const otherId: PlayerId = selfId === "me" ? "aanya" : "me";
   const other = duet[otherId];
@@ -227,7 +231,6 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
     const t = draft.trim();
     if (!t) return;
     duet.sendMessage(selfId, t);
-    if (phase === "silent" || phase === "trigger" || phase === "dismissed") duet.openChat(selfId);
     setDraft("");
   };
 
@@ -248,7 +251,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
         />
       )}
       <div style={{ height: "100%", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? KEYBOARD_HEIGHT : 0, transition: "padding-bottom var(--dur-base) var(--ease)" }}>
-        <MatchHeader other={otherPerson} onBack={duet.reset} />
+        <MatchHeader other={otherPerson} onBack={duet.reset} onDevice={onDevice} />
 
         <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", paddingBottom: kbVisible ? 16 : 24 }}>
           {/* the like + start-chat history stays through every phase */}
@@ -387,7 +390,7 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
                 ref={inputRef}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                onFocus={() => setKbVisible(true)}
+                onFocus={() => !onDevice && setKbVisible(true)}
                 onBlur={() => setKbVisible(false)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSend();
@@ -425,13 +428,14 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
         {!kbVisible && <GestureNav />}
       </div>
 
-      {showInput && <MockKeyboard visible={kbVisible} />}
+      {showInput && !onDevice && <MockKeyboard visible={kbVisible} />}
 
       <GameSheet
         open={phase === "intro" || phase === "connect" || phase === "playing"}
         onClose={() => duet.dismiss(selfId)}
         variant={duet.sheetStyle}
         fullHeight={phase === "intro" || phase === "connect" || phase === "playing"}
+        onDevice={onDevice}
       >
         {/* One sheet that morphs between steps. The app bar is shared and stays put;
             only the step content below it slides in horizontally on phase change. */}
@@ -472,14 +476,17 @@ export default function PlayerPhone({ duet, selfId }: { duet: Duet; selfId: Play
       </GameSheet>
 
 
-      <GameSheet open={detailsOpen} onClose={() => setDetailsOpen(false)} variant={duet.sheetStyle}>
+      <GameSheet open={detailsOpen} onClose={() => setDetailsOpen(false)} variant={duet.sheetStyle} onDevice={onDevice}>
         <CommonGroundSheet selfState={self} otherState={other} selfPerson={selfPerson} otherPerson={otherPerson} otherName={otherPerson.name} onClose={() => setDetailsOpen(false)} />
       </GameSheet>
 
-      {/* the iOS status bar is fixed: one overlay above everything (chat + sheets) */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 50 }}>
-        <StatusBar backgroundColor="transparent" />
-      </div>
+      {/* the iOS status bar is fixed: one overlay above everything (chat + sheets).
+          Hidden on a real device, which already shows its own. */}
+      {!onDevice && (
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 50 }}>
+          <StatusBar backgroundColor="transparent" />
+        </div>
+      )}
     </div>
   );
 }
