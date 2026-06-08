@@ -265,7 +265,7 @@ export default function PlayerPhone({ duet, selfId, onDevice = false }: { duet: 
           <ChatStart self={selfPerson} other={otherPerson} />
 
           {nudgeVisible && (
-            <div className="anim-nudge-up" style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <div className={onDevice ? "anim-soft-in" : "anim-nudge-up"} style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
               <ChatTimestamp />
               <div
                 role="button"
