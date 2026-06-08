@@ -59,9 +59,11 @@ function Indicator({ multi, checked }: { multi: boolean; checked: boolean }) {
     return <span style={{ width: 18, height: 18, borderRadius: radius, background: "#F1F1F1", flexShrink: 0 }} />;
   }
   return (
-    <span style={{ width: 18, height: 18, borderRadius: radius, background: MAIN_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
-        <path d="M2.5 7.5L6 11L11.5 4" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <span style={{ width: 18, height: 18, borderRadius: radius, background: MAIN_PRIMARY, display: "grid", placeItems: "center", flexShrink: 0 }}>
+      {/* Path bbox centered in the viewBox (was 0.5 low); display:block drops the inline
+          baseline gap so the tick stays centered under the device transform scale. */}
+      <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ display: "block" }}>
+        <path d="M2.5 7L6 10.5L11.5 3.5" stroke={ALPHA_WHITE_FF} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   );
@@ -177,7 +179,7 @@ export default function IcebreakerStory({
           className="transition-transform active:scale-[0.95]"
           style={{ width: 48, height: 48, flexShrink: 0, borderRadius: 24, border: "none", background: MAIN_PRIMARY, opacity: selected.length ? 1 : 0.35, cursor: selected.length ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "opacity var(--dur-micro) var(--ease)" }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ display: "block" }}>
             <path d="M10 6l6 6-6 6" stroke={ALPHA_WHITE_FF} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>

@@ -27,12 +27,12 @@ export default function TriggerCard({
   const onDevice = useContext(OnDeviceContext);
   return (
     <div style={{ background: BG_SHEET, display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", justifyContent: onDevice ? "center" : "flex-start", padding: onDevice ? "0px 24px 48px" : "0px 24px 8px" }}>
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", justifyContent: onDevice ? "center" : "flex-start", padding: onDevice ? "0px 24px 24px" : "0px 24px 8px" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icebreaker-hero.png" alt="" style={{ width: 282, maxWidth: "100%", height: "auto", display: "block", marginTop: -20, WebkitMaskImage: FEATHER, maskImage: FEATHER }} />
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 40, width: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: onDevice ? 28 : 40, width: "100%" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 16 }}>
               <h2 style={{ fontFamily: FONT_SERIF, fontWeight: 600, fontSize: 30, lineHeight: "31px", letterSpacing: "-0.4px", color: TEXT_PRIMARY, margin: 0, maxWidth: 240 }}>
                 Break the ice<br />together
@@ -62,7 +62,7 @@ export default function TriggerCard({
           type="button"
           onClick={onContinue}
           className="transition-transform active:scale-[0.98]"
-          style={{ width: "100%", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 14, lineHeight: "20px", color: ALPHA_WHITE_FF, background: MAIN_PRIMARY, border: "none", borderRadius: 25, padding: "14px 18px", cursor: "pointer" }}
+          style={{ width: "100%", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 14, lineHeight: "20px", color: ALPHA_WHITE_FF, background: MAIN_PRIMARY, border: "none", borderRadius: 25, padding: onDevice ? "16px 18px 12px" : "14px 18px", cursor: "pointer" }}
         >
           Start Icebreaker
         </button>

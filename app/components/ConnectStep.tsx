@@ -191,8 +191,8 @@ export default function ConnectStep({
           className="transition-transform active:scale-[0.98]"
           style={
             anyConnected
-              ? { width: "100%", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 14, lineHeight: "20px", color: ALPHA_WHITE_FF, background: MAIN_PRIMARY, border: "none", borderRadius: 25, padding: "14px 18px", cursor: "pointer" }
-              : { width: "100%", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 14, lineHeight: "20px", color: TEXT_SECONDARY, background: "transparent", border: "none", borderRadius: 25, padding: "14px 18px", cursor: "pointer" }
+              ? { width: "100%", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 14, lineHeight: "20px", color: ALPHA_WHITE_FF, background: MAIN_PRIMARY, border: "none", borderRadius: 25, padding: onDevice ? "16px 18px 12px" : "14px 18px", cursor: "pointer" }
+              : { width: "100%", fontFamily: FONT_SANS, fontWeight: 700, fontSize: 14, lineHeight: "20px", color: TEXT_SECONDARY, background: "transparent", border: "none", borderRadius: 25, padding: onDevice ? "16px 18px 12px" : "14px 18px", cursor: "pointer" }
           }
         >
           {anyConnected ? "Generate questions" : "Skip to questions"}
